@@ -1,0 +1,120 @@
+{
+  "projectType": "saas",
+  "projectName": "GitFolio",
+  "projectDescription": "Turn your GitHub profile into a professional portfolio website in seconds",
+  "theme": "almond",
+  "primaryColor": "#6366f1",
+  "lightColor": "#818cf8",
+  "darkColor": "#4f46e5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/templates",
+              "features/github-sync",
+              "features/customization",
+              "features/themes"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/setup-portfolio",
+              "guides/customize-template",
+              "guides/manage-content",
+              "guides/publish-portfolio"
+            ]
+          },
+          {
+            "group": "Templates",
+            "pages": [
+              "templates/overview",
+              "templates/available-templates",
+              "templates/creating-templates",
+              "templates/contributing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Overview",
+            "pages": [
+              "api/overview",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api/dashboard",
+              "api/onboarding",
+              "api/renderer",
+              "api/s3",
+              "api/payments"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Community",
+        "groups": [
+          {
+            "group": "Contributing",
+            "pages": [
+              "community/contributing",
+              "community/development-setup",
+              "community/code-style"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "community/faq",
+              "community/support"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Automatic GitHub profile sync",
+    "Multiple customizable templates",
+    "Real-time portfolio rendering",
+    "Subscription and payment management",
+    "Custom domain support",
+    "SEO optimized portfolios",
+    "Responsive design for all devices",
+    "Template marketplace"
+  ],
+  "publicApiSurface": [
+    "POST /api/v1/onboarding",
+    "GET /api/v1/dashboard",
+    "PUT /api/v1/dashboard/profile",
+    "GET /api/v1/dashboard/repos",
+    "PUT /api/v1/dashboard/repos/:id",
+    "GET /api/v1/dashboard/templates",
+    "POST /api/v1/dashboard/templates/activate",
+    "GET /api/v1/renderer/:username",
+    "POST /api/v1/s3/upload",
+    "POST /api/v1/razorpay/create-order",
+    "POST /api/v1/razorpay/verify-payment",
+    "POST /api/v1/webhook/clerk",
+    "GET /api/v1/utils/templates"
+  ]
+}
