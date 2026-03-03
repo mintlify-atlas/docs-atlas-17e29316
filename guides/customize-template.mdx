@@ -1,0 +1,265 @@
+---
+title: Customize your template
+description: Learn how to select and customize portfolio templates to match your personal brand
+---
+
+## Overview
+
+GitFolio offers multiple professionally designed templates to showcase your work. This guide explains how to browse, preview, and activate templates for your portfolio.
+
+## Access templates
+
+<Steps>
+  <Step title="Navigate to Templates">
+    From your dashboard, click **Templates** in the sidebar navigation. This opens the template gallery where you can browse all available options.
+  </Step>
+
+  <Step title="Browse available templates">
+    The template gallery displays all templates in a grid layout. Each template card shows:
+
+    - Template preview images (light and dark modes)
+    - Template name
+    - Category (e.g., Modern, Minimal, Creative)
+    - Pricing information (free or premium)
+  </Step>
+</Steps>
+
+## Template categories
+
+GitFolio templates are organized into categories to help you find the right style:
+
+<CardGroup cols={2}>
+  <Card title="Modern" icon="sparkles">
+    Contemporary designs with bold typography and vibrant colors
+  </Card>
+  
+  <Card title="Minimal" icon="circle">
+    Clean, simple layouts that focus on content
+  </Card>
+  
+  <Card title="Professional" icon="briefcase">
+    Classic, business-oriented designs
+  </Card>
+  
+  <Card title="Creative" icon="palette">
+    Unique, artistic layouts for designers and artists
+  </Card>
+</CardGroup>
+
+## Preview a template
+
+<Steps>
+  <Step title="Select a template to preview">
+    Click on any template card to open the detailed preview view.
+  </Step>
+
+  <Step title="View template details">
+    The preview page shows:
+
+    - Full-screen template previews
+    - Light and dark mode variations
+    - Responsive design previews (desktop, tablet, mobile)
+    - Template features and included sections
+    - Pricing details
+  </Step>
+
+  <Step title="Return to gallery">
+    Click **Back to Templates** to return to the template gallery and browse other options.
+  </Step>
+</Steps>
+
+## Activate a template
+
+### Free templates
+
+<Steps>
+  <Step title="Select your template">
+    From the template preview page, click the **Select Template** or **Activate** button.
+  </Step>
+
+  <Step title="Confirm activation">
+    The template will be immediately applied to your portfolio. You'll see a success message confirming the change.
+  </Step>
+
+  <Step title="Preview your portfolio">
+    Click **Preview** in the dashboard sidebar to see your portfolio with the new template.
+  </Step>
+</Steps>
+
+### Premium templates
+
+<Info>
+  Premium templates require a one-time purchase or active subscription depending on your account type.
+</Info>
+
+<Steps>
+  <Step title="Select a premium template">
+    Click on a premium template to view its details and pricing.
+  </Step>
+
+  <Step title="Purchase template">
+    Click **Purchase Template** to proceed to checkout.
+
+    <Tabs>
+      <Tab title="One-time purchase">
+        - Review pricing in USD or INR
+        - Complete payment through the secure Razorpay gateway
+        - Template is added to your account immediately
+      </Tab>
+
+      <Tab title="Subscription">
+        Premium account holders have access to all premium templates.
+        
+        - Upgrade to Premium if you haven't already
+        - All premium templates become available
+        - Access remains active while subscription is valid
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Activate purchased template">
+    After purchase, the template appears in your available templates. Click **Select Template** to activate it.
+  </Step>
+</Steps>
+
+## Switch between templates
+
+You can change your active template at any time:
+
+<Steps>
+  <Step title="Open Templates">
+    Navigate to **Templates** from your dashboard sidebar.
+  </Step>
+
+  <Step title="Select new template">
+    Browse and select a different template you own (free or purchased).
+  </Step>
+
+  <Step title="Activate">
+    Click **Select Template** to make it active.
+
+    <Warning>
+      Changing templates will update how your content is displayed but won't delete any of your data. All your projects, experience, education, and skills remain intact.
+    </Warning>
+  </Step>
+</Steps>
+
+## Template customization options
+
+While templates control the overall design, you can customize how your content appears:
+
+### What you can customize
+
+- **Content visibility** - Choose which sections to display (projects, experience, education, skills)
+- **Project selection** - Select which repositories appear in your portfolio
+- **Profile information** - Update bio, tagline, location, and social links
+- **Skills display** - Add or remove skills shown in your portfolio
+- **Color scheme** - Most templates support both light and dark modes
+
+### What is controlled by the template
+
+- **Layout structure** - Section arrangement and spacing
+- **Typography** - Font families and sizes
+- **Color palette** - Primary, secondary, and accent colors
+- **Component design** - Button styles, card layouts, animations
+
+<Info>
+  Template customization happens automatically based on your content. Update your profile, projects, and other content from the respective dashboard sections.
+</Info>
+
+## Preview your portfolio
+
+Before publishing, always preview your portfolio to see how it looks:
+
+<Steps>
+  <Step title="Open preview">
+    Click **Preview** in the dashboard sidebar.
+  </Step>
+
+  <Step title="Review your portfolio">
+    The preview shows your live portfolio with:
+    - Current active template
+    - All your content as it will appear to visitors
+    - Responsive design for different screen sizes
+  </Step>
+
+  <Step title="Test interactions">
+    - Click through project links
+    - Test social media buttons
+    - Verify all sections display correctly
+    - Check both light and dark modes (if supported)
+  </Step>
+</Steps>
+
+## Portfolio URL structure
+
+Your portfolio is accessible at:
+
+```
+https://gitfolio.com/portfolio/[your-username]
+```
+
+The template you select controls how content is rendered at this URL.
+
+<Note>
+  Your username is set during onboarding and automatically converted to lowercase. It can be updated from the **Personal Info** section of your dashboard.
+</Note>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Template not applying to my portfolio">
+    **Solution:** 
+    1. Ensure you clicked the activation button after selecting the template
+    2. Check that you received a success confirmation message
+    3. Clear your browser cache and reload the preview
+    4. Verify your `activeTemplateId` is set in the Overview section
+  </Accordion>
+
+  <Accordion title="Cannot purchase premium template">
+    **Possible causes:**
+    - Payment processing error
+    - Invalid payment information
+    - Currency mismatch
+
+    **Solution:**
+    1. Verify your payment details are correct
+    2. Ensure your payment method supports international transactions
+    3. Try a different payment method
+    4. Contact support if the issue persists
+  </Accordion>
+
+  <Accordion title="Template looks different than preview">
+    **Possible causes:**
+    - Missing content in certain sections
+    - Browser compatibility issues
+    - Cached version being displayed
+
+    **Solution:**
+    1. Ensure all required content sections are filled out
+    2. Clear browser cache and hard reload (Ctrl+Shift+R or Cmd+Shift+R)
+    3. Try viewing in a different browser
+    4. Add content to empty sections for best results
+  </Accordion>
+
+  <Accordion title="Lost access to premium template after subscription ended">
+    This is expected behavior. Premium templates require an active subscription or one-time purchase.
+
+    **Solution:**
+    - Renew your subscription to regain access to all premium templates
+    - Purchase the specific template with a one-time payment
+    - Switch to a free template you own
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Manage your content" icon="pen-to-square" href="/guides/manage-content">
+    Add and edit projects, experience, education, and skills
+  </Card>
+  
+  <Card title="Publish your portfolio" icon="rocket" href="/guides/publish-portfolio">
+    Share your portfolio with the world
+  </Card>
+</CardGroup>

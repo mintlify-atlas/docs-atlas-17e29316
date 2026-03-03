@@ -1,0 +1,132 @@
+---
+title: 'API Overview'
+description: 'Introduction to the GitFolio REST API for portfolio management'
+---
+
+## Introduction
+
+The GitFolio API is a REST API that allows you to programmatically manage developer portfolios, including profile data, repositories, education, experience, and premium templates.
+
+## Base URL
+
+All API requests should be made to:
+
+```
+https://api.gitfolio.in/api/v1
+```
+
+For local development:
+
+```
+http://localhost:3000/api/v1
+```
+
+## API Versioning
+
+The current API version is `v1`. The version is included in the URL path for all endpoints.
+
+## Request Format
+
+All requests should:
+- Use HTTPS in production
+- Include `Content-Type: application/json` header for POST requests
+- Include `Authorization: Bearer <token>` header for authenticated endpoints
+
+## Response Format
+
+All API responses follow a consistent format:
+
+```json
+{
+  "status": "success" | "error",
+  "message": "Description of the result",
+  "data": {} // Optional, included when returning data
+}
+```
+
+### Success Response
+
+```json
+{
+  "status": "success",
+  "message": "Data fetched successfully",
+  "data": {
+    // Response data
+  }
+}
+```
+
+### Error Response
+
+```json
+{
+  "status": "error",
+  "message": "Error description"
+}
+```
+
+## HTTP Status Codes
+
+The API uses standard HTTP status codes:
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request - Invalid parameters |
+| 401 | Unauthorized - Missing or invalid authentication |
+| 403 | Forbidden - Valid auth but insufficient permissions |
+| 404 | Not Found - Resource doesn't exist |
+| 500 | Internal Server Error |
+
+## Rate Limiting
+
+Currently, the GitFolio API does not enforce rate limits. However, we recommend:
+- Maximum 100 requests per minute per user
+- Implement exponential backoff for failed requests
+- Cache responses when appropriate
+
+Rate limiting may be implemented in future versions.
+
+## CORS Policy
+
+The API supports CORS for the following origins:
+- `https://gitfolio.in`
+- `https://www.gitfolio.in`
+- `https://*.gitfolio.in` (all subdomains)
+- `http://localhost:3000` (development)
+- `http://localhost:4000` (development)
+
+Allowed methods: GET, POST, PUT, DELETE, OPTIONS
+
+## Authentication
+
+Most endpoints require authentication using Clerk. See the [Authentication](/api/authentication) page for details.
+
+## Public Endpoints
+
+The following endpoints are publicly accessible without authentication:
+- `GET /api/v1/renderer/:username` - Get public portfolio data
+- `GET /api/v1/renderer/image/:username` - Get portfolio image data
+- `GET /api/health` - Health check
+
+## Pagination
+
+Currently, the API does not implement pagination. All results are returned in a single response.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/api/authentication">
+    Learn how to authenticate API requests
+  </Card>
+  <Card title="Dashboard API" icon="chart-line" href="/api/dashboard">
+    Manage user profiles and portfolio data
+  </Card>
+  <Card title="Onboarding" icon="rocket" href="/api/onboarding">
+    Import GitHub data for new users
+  </Card>
+  <Card title="Payments" icon="credit-card" href="/api/payments">
+    Handle premium template purchases
+  </Card>
+</CardGroup>

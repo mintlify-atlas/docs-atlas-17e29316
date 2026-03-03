@@ -1,0 +1,481 @@
+---
+title: Code Style & Standards
+description: Code conventions, best practices, and quality standards for contributing to GitFolio.
+---
+
+This guide outlines the code style and standards expected for all GitFolio contributions.
+
+## General Principles
+
+All code contributions should follow these core principles:
+
+- **Consistency** - Follow existing patterns in the codebase
+- **Readability** - Write code that's easy to understand
+- **Maintainability** - Keep code modular and well-organized
+- **Quality** - Test thoroughly and handle edge cases
+- **Accessibility** - Ensure templates are usable by everyone
+
+## TypeScript Standards
+
+<Note>
+  All template files must be written in TypeScript. JavaScript is not accepted for new contributions.
+</Note>
+
+### Type Safety
+
+Always use proper TypeScript types:
+
+```tsx Good Example
+import { DATA } from "@workspace/types";
+import { FC } from "react";
+
+interface TemplateProps {
+  data: DATA;
+}
+
+const Template: FC<TemplateProps> = ({ data }) => {
+  return <div>{data.name}</div>;
+};
+```
+
+```tsx Bad Example
+// Avoid using 'any'
+const Template = ({ data }: any) => {
+  return <div>{data.name}</div>;
+};
+```
+
+### Type Imports
+
+Use the shared types package for data structures:
+
+```tsx
+import { DATA } from "@workspace/types";
+import { useTheme } from "next-themes";
+```
+
+### Interface vs Type
+
+- Use `interface` for component props and object shapes
+- Use `type` for unions, intersections, and utility types
+
+```tsx
+// Component props - use interface
+interface HeaderProps {
+  title: string;
+  subtitle?: string;
+}
+
+// Union types - use type
+type Theme = "light" | "dark" | "system";
+```
+
+## React Component Patterns
+
+### Functional Components
+
+Always use functional components with hooks:
+
+```tsx Good Example
+import React, { FC } from "react";
+import { DATA } from "@workspace/types";
+import { useTheme } from "next-themes";
+
+interface TemplateProps {
+  data?: DATA;
+}
+
+const Template: FC<TemplateProps> = ({ data = DummyData }) => {
+  const { setTheme } = useTheme();
+
+  React.useEffect(() => {
+    setTheme("dark");
+  }, []);
+
+  return (
+    <div className="container">
+      {/* Template content */}
+    </div>
+  );
+};
+
+export default Template;
+```
+
+### Component Organization
+
+Structure components logically:
+
+1. **Imports** - External dependencies first, then internal
+2. **Type definitions** - Interfaces and types
+3. **Component definition** - Main component logic
+4. **Exports** - Default and named exports
+
+```tsx
+// 1. Imports
+import React, { FC, useState } from "react";
+import { DATA } from "@workspace/types";
+import { Header } from "./components/Header";
+
+// 2. Type definitions
+interface TemplateProps {
+  data: DATA;
+}
+
+// 3. Component
+const Template: FC<TemplateProps> = ({ data }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return <div>...</div>;
+};
+
+// 4. Exports
+export default Template;
+```
+
+### Component Composition
+
+Keep components small and focused:
+
+```tsx Good Example
+// Small, focused components
+const Header: FC<HeaderProps> = ({ title }) => (
+  <header>{title}</header>
+);
+
+const Footer: FC<FooterProps> = ({ links }) => (
+  <footer>{links.map(link => ...)}</footer>
+);
+
+const Template: FC<TemplateProps> = ({ data }) => (
+  <div>
+    <Header title={data.name} />
+    <main>{/* content */}</main>
+    <Footer links={data.links} />
+  </div>
+);
+```
+
+```tsx Bad Example
+// Monolithic component with everything
+const Template = ({ data }) => (
+  <div>
+    <header>
+      {/* 100 lines of header code */}
+    </header>
+    <main>
+      {/* 200 lines of main content */}
+    </main>
+    <footer>
+      {/* 100 lines of footer code */}
+    </footer>
+  </div>
+);
+```
+
+## Styling with Tailwind CSS
+
+<Note>
+  All styling must use Tailwind CSS for consistency across templates.
+</Note>
+
+### Tailwind Best Practices
+
+```tsx Good Example
+// Use Tailwind utility classes
+<div className="container mx-auto px-4 py-8">
+  <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+    {title}
+  </h1>
+</div>
+```
+
+```tsx Bad Example
+// Avoid inline styles
+<div style={{ margin: '0 auto', padding: '2rem' }}>
+  <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold' }}>
+    {title}
+  </h1>
+</div>
+```
+
+### Responsive Design
+
+Always implement responsive designs:
+
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {projects.map(project => (
+    <ProjectCard key={project.id} {...project} />
+  ))}
+</div>
+```
+
+Use Tailwind breakpoints:
+- `sm:` - 640px and up
+- `md:` - 768px and up
+- `lg:` - 1024px and up
+- `xl:` - 1280px and up
+- `2xl:` - 1536px and up
+
+### Dark Mode Support
+
+Implement dark mode using `next-themes`:
+
+```tsx
+import { useTheme } from "next-themes";
+
+const Template: FC<TemplateProps> = ({ data }) => {
+  const { setTheme } = useTheme();
+
+  React.useEffect(() => {
+    setTheme("dark"); // Set default theme
+  }, []);
+
+  return (
+    <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+      {/* Content */}
+    </div>
+  );
+};
+```
+
+## Accessibility Standards
+
+All templates must follow accessibility best practices:
+
+### Semantic HTML
+
+```tsx Good Example
+<header>
+  <nav aria-label="Main navigation">
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+    </ul>
+  </nav>
+</header>
+<main>
+  <section aria-labelledby="about-heading">
+    <h2 id="about-heading">About Me</h2>
+  </section>
+</main>
+```
+
+```tsx Bad Example
+<div>
+  <div>
+    <div onClick={() => navigate('/about')}>About</div>
+    <div onClick={() => navigate('/projects')}>Projects</div>
+  </div>
+</div>
+```
+
+### Keyboard Navigation
+
+Ensure all interactive elements are keyboard accessible:
+
+```tsx
+// Buttons should be actual button elements
+<button
+  onClick={handleClick}
+  aria-label="Close menu"
+  className="focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
+  Close
+</button>
+
+// Links should be actual anchor elements
+<a
+  href={project.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
+  View Project
+</a>
+```
+
+### ARIA Labels
+
+Use ARIA attributes when needed:
+
+```tsx
+<button
+  aria-label="Toggle dark mode"
+  aria-pressed={isDark}
+  onClick={toggleTheme}
+>
+  <Icon name={isDark ? "sun" : "moon"} aria-hidden="true" />
+</button>
+```
+
+### Alt Text for Images
+
+```tsx
+<img
+  src={data.avatar}
+  alt={`${data.name}'s profile picture`}
+  className="rounded-full"
+/>
+```
+
+## File Organization
+
+### Template Structure
+
+```
+Templates/
+└── YourTemplate/
+    ├── components/
+    │   ├── Header.tsx
+    │   ├── About.tsx
+    │   ├── Projects.tsx
+    │   └── Footer.tsx
+    └── template.tsx
+```
+
+### Component Files
+
+Each component should:
+- Have a single responsibility
+- Be in its own file
+- Export as a named or default export
+- Include proper TypeScript types
+
+## Code Formatting
+
+<Note>
+  GitFolio uses Prettier for automatic code formatting. Run `pnpm run format` before committing.
+</Note>
+
+### Prettier Configuration
+
+The project uses standard Prettier settings. Code is automatically formatted on commit.
+
+### Manual Formatting
+
+```bash
+# Format all files
+pnpm run format
+
+# Check formatting
+pnpm run lint
+```
+
+## Testing Requirements
+
+Before submitting your contribution:
+
+<Steps>
+  <Step title="Visual Testing">
+    Test your template on multiple screen sizes:
+    - Mobile (375px, 414px)
+    - Tablet (768px, 1024px)
+    - Desktop (1280px, 1920px)
+  </Step>
+  
+  <Step title="Browser Testing">
+    Test in modern browsers:
+    - Chrome/Edge
+    - Firefox
+    - Safari
+  </Step>
+  
+  <Step title="Dark Mode Testing">
+    Verify your template works in both light and dark modes.
+  </Step>
+  
+  <Step title="Accessibility Testing">
+    - Navigate using only keyboard
+    - Test with screen reader
+    - Check color contrast ratios
+  </Step>
+  
+  <Step title="Build Testing">
+    Ensure your template builds without errors:
+    ```bash
+    pnpm run build --filter=renderer
+    ```
+  </Step>
+</Steps>
+
+## Commit Message Format
+
+Use conventional commit format:
+
+```bash
+feat: add new portfolio template
+fix: resolve responsive layout issue
+docs: update contribution guidelines
+style: format code with prettier
+refactor: simplify component structure
+test: add unit tests for components
+```
+
+Commit message structure:
+- **Type**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- **Scope** (optional): Area of change
+- **Description**: Clear, concise description
+
+## Common Mistakes to Avoid
+
+<Accordion title="Using 'any' Type">
+  Avoid using `any` type. Use proper TypeScript types or `unknown` if type is truly dynamic.
+  
+  ```tsx
+  // Bad
+  const handleData = (data: any) => {...}
+  
+  // Good
+  const handleData = (data: DATA) => {...}
+  ```
+</Accordion>
+
+<Accordion title="Hardcoded Values">
+  Use data from props instead of hardcoded values.
+  
+  ```tsx
+  // Bad
+  <h1>John Doe</h1>
+  
+  // Good
+  <h1>{data.name}</h1>
+  ```
+</Accordion>
+
+<Accordion title="Missing Responsive Design">
+  Always implement responsive breakpoints.
+  
+  ```tsx
+  // Bad
+  <div className="w-1/3">
+  
+  // Good
+  <div className="w-full md:w-1/2 lg:w-1/3">
+  ```
+</Accordion>
+
+<Accordion title="Accessibility Issues">
+  Use semantic HTML and proper ARIA attributes.
+  
+  ```tsx
+  // Bad
+  <div onClick={handleClick}>Click me</div>
+  
+  // Good
+  <button onClick={handleClick} aria-label="Submit form">Click me</button>
+  ```
+</Accordion>
+
+## Resources
+
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [React Documentation](https://react.dev/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Web Accessibility Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+
+## Questions?
+
+If you have questions about code standards, check our [FAQ](/community/faq) or reach out for [support](/community/support).

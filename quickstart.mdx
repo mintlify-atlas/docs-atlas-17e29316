@@ -1,80 +1,192 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Get your GitFolio portfolio up and running in under 5 minutes
 ---
 
-## Get started in three steps
+# Quickstart
 
-Get your documentation site running locally and make your first customization.
+Get your professional portfolio website live in just a few minutes. This quickstart guide will walk you through creating your account, importing your GitHub data, selecting a template, and publishing your portfolio.
 
-### Step 1: Set up your local environment
+## Step 1: Create your account
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+Visit [GitFolio](https://gitfolio.in) and sign up using one of three methods:
 
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+<CardGroup cols={3}>
+  <Card title="GitHub" icon="github">
+    **Recommended** - Automatic data sync
+  </Card>
+  <Card title="Google" icon="google">
+    Quick OAuth authentication
+  </Card>
+  <Card title="Email" icon="envelope">
+    Traditional email + password
+  </Card>
 </CardGroup>
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  Signing up with GitHub is recommended as it enables automatic profile syncing without manual input.
+</Note>
+
+## Step 2: Import your GitHub data
+
+<Steps>
+  <Step title="Enter your GitHub username">
+    After signing up, you'll be redirected to the onboarding page. Enter your GitHub username or profile URL:
+    
+    ```
+    github.com/yourusername
+    ```
+    
+    If you signed in with GitHub, this field will be pre-filled.
+  </Step>
+
+  <Step title="Wait for data import">
+    GitFolio will automatically fetch your GitHub data:
+    
+    - Profile information (name, bio, avatar, location)
+    - All public repositories with metadata
+    - Repository languages and topics
+    - Stars, forks, and deployment information
+    
+    <Info>
+      This typically takes 10-30 seconds depending on the number of repositories you have.
+    </Info>
+  </Step>
+
+  <Step title="Complete onboarding">
+    Once the import finishes, click **Continue to Dashboard** to access your portfolio management interface.
+  </Step>
+</Steps>
+
+## Step 3: Choose a template
+
+GitFolio offers 8 professionally designed templates. Browse and select the one that matches your style:
+
+<CardGroup cols={2}>
+  <Card title="DevPro" icon="briefcase">
+    Professional centered layout with emphasis on experience
+  </Card>
+  <Card title="Black & White" icon="palette">
+    Minimalist design with dock-style navigation
+  </Card>
+  <Card title="Persona" icon="user">
+    Personality-focused dark theme with bold typography
+  </Card>
+  <Card title="Clean Slate" icon="sparkles">
+    Modern monochrome with clean sections
+  </Card>
+</CardGroup>
+
+And 4 more: **White Space**, **Pixel Perfect**, **Obsidian**, and **Notion Theme**.
+
+<Info>
+  All templates are currently **free to use**. You can switch templates at any time from your dashboard.
+</Info>
+
+To select a template:
+
+1. Navigate to the **Templates** tab in your dashboard
+2. Browse the available templates with live previews
+3. Click **Select Template** on your preferred design
+4. Your portfolio will instantly update
+
+## Step 4: Customize your portfolio
+
+Enhance your portfolio with custom content:
+
+### Personal information
+
+- Update your **tagline** and **bio**
+- Add your **location** and **website**
+- Upload a custom **profile image**
+
+### Manage projects
+
+- Show or hide specific repositories
+- Upload custom **thumbnails** for projects
+- Add **live demo links** for deployed projects
+
+### Add experience
+
+- Document your work history
+- Include **company logos**
+- Specify date ranges and roles
+
+### Add education
+
+- List your academic background
+- Include **institution logos**
+- Add degree details and dates
+
+### Social links
+
+Connect your professional profiles:
+
+- GitHub, LinkedIn, Twitter
+- Portfolio websites
+- Medium, Dev.to, and more
+
+### Skills
+
+Tag your technical expertise to highlight your strengths.
+
+<Tip>
+  You can customize everything from the **Dashboard** tab in the main navigation.
+</Tip>
+
+## Step 5: View your live portfolio
+
+Your portfolio is automatically published at:
+
+```
+https://portfolio.gitfolio.in/yourusername
+```
+
+Click **Preview Portfolio** in the dashboard to see your live site.
+
+<Warning>
+  Make sure you've selected a template before viewing your portfolio. Without a template, the portfolio won't display properly.
+</Warning>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Understanding the architecture" icon="diagram-project" href="/how-it-works">
+    Learn how GitFolio's rendering engine and sync system work
+  </Card>
+  <Card title="Dashboard guide" icon="gauge" href="/guides/manage-content">
+    Deep dive into all dashboard features and customization options
+  </Card>
+  <Card title="Template customization" icon="palette" href="/templates/overview">
+    Explore template options and customization possibilities
+  </Card>
+  <Card title="Publishing guide" icon="globe" href="/guides/publish-portfolio">
+    Learn how to publish and share your portfolio
+  </Card>
+</CardGroup>
+
+## Common questions
+
+<Accordion title="Can I use a custom domain?">
+  Currently, all portfolios are hosted at `portfolio.gitfolio.in/username`. Custom domain support is planned for future releases.
+</Accordion>
+
+<Accordion title="How often does my portfolio update?">
+  Your portfolio data syncs automatically once per day. You can also manually trigger a refresh from your dashboard.
+</Accordion>
+
+<Accordion title="Are all templates free?">
+  Yes! All 8 templates are currently available for free. Future premium templates may be added to the marketplace.
+</Accordion>
+
+<Accordion title="Can I switch templates after selecting one?">
+  Absolutely! You can switch between templates at any time from the Templates tab in your dashboard. Your content and customizations remain intact.
+</Accordion>
+
+<Accordion title="What if I don't have many repositories?">
+  No problem! GitFolio works with any number of repositories. You can also manually add projects, experience, and education to fill out your portfolio.
+</Accordion>
+
+<Note>
+  Need help? Check out our [FAQ](/community/faq) or reach out for [support](/community/support).
 </Note>

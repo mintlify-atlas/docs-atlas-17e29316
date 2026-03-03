@@ -1,0 +1,495 @@
+---
+title: "Contributing Templates"
+description: "Guide for contributing your custom templates to the GitFolio template library"
+---
+
+## Overview
+
+Contributing a template to GitFolio helps the community and gets your work featured in the official template gallery. This guide covers the entire contribution process from development to submission.
+
+## Before You Start
+
+<Note>
+All contributed templates must be original work or properly licensed. Templates become part of the GitFolio open-source project.
+</Note>
+
+### Contribution Requirements
+
+<CardGroup cols={2}>
+  <Card title="Code Quality" icon="code">
+    - TypeScript strict mode compliant
+    - ESLint warnings resolved
+    - Clean, commented code
+  </Card>
+  <Card title="Design Quality" icon="palette">
+    - Fully responsive (mobile/tablet/desktop)
+    - Accessible (WCAG 2.1 AA)
+    - Professional appearance
+  </Card>
+  <Card title="Functionality" icon="check">
+    - All DATA fields supported
+    - Dark/light themes (or document limitation)
+    - No build errors
+  </Card>
+  <Card title="Documentation" icon="book">
+    - Template description
+    - Screenshots/video preview
+    - Special features noted
+  </Card>
+</CardGroup>
+
+## Development Workflow
+
+### 1. Fork and Clone
+
+```bash
+# Fork the repository on GitHub
+# Then clone your fork
+git clone https://github.com/YOUR_USERNAME/GitFolio.git
+cd GitFolio
+```
+
+### 2. Create a Branch
+
+```bash
+git checkout -b template/my-awesome-template
+```
+
+<Accordion title="Branch naming convention">
+Use the format `template/template-name` for template contributions. For example:
+- `template/neon-dreams`
+- `template/minimalist-pro`
+- `template/developer-showcase`
+</Accordion>
+
+### 3. Install Dependencies
+
+```bash
+pnpm install
+```
+
+### 4. Create Your Template
+
+Follow the structure in [Creating Templates](/templates/creating-templates):
+
+```
+packages/templates/src/Templates/
+└── YourTemplateName/
+    ├── components/
+    │   ├── Hero.tsx
+    │   ├── Projects.tsx
+    │   ├── Experience.tsx
+    │   └── Footer.tsx
+    └── template.tsx
+```
+
+### 5. Export Your Template
+
+Add to `packages/templates/src/Templates/index.ts`:
+
+```typescript packages/templates/src/Templates/index.ts
+export { default as Your_Template_Name } from "./YourTemplateName/template";
+```
+
+### 6. Test Locally
+
+```bash
+# Build the renderer
+pnpm run build --filter=renderer
+
+# Start development server
+pnpm run dev --filter=renderer
+```
+
+Update `packages/renderer/app/page.tsx` to preview:
+
+```tsx
+import { Your_Template_Name } from "@workspace/templates";
+
+export default function Page() {
+  return <Your_Template_Name />;
+}
+```
+
+### 7. Verify Build
+
+Ensure production build succeeds:
+
+```bash
+pnpm run build --filter=renderer
+```
+
+<Warning>
+All templates must build without errors or warnings. Fix any TypeScript or linting issues before submitting.
+</Warning>
+
+## Code Style and Standards
+
+### TypeScript Guidelines
+
+```tsx
+// ✅ Good: Proper typing
+import { DATA } from "@workspace/types";
+
+const template = ({ data = DummyData }: { data?: DATA }) => {
+  return <div>{data.personalInfo.full_name}</div>;
+};
+
+// ❌ Bad: Using 'any'
+const template = ({ data }: any) => {
+  return <div>{data.personalInfo.full_name}</div>;
+};
+```
+
+### Component Best Practices
+
+```tsx
+// ✅ Good: Small, focused components
+interface HeroProps {
+  data: PersonalInformation;
+}
+
+export default function Hero({ data }: HeroProps) {
+  return (
+    <section>
+      <h1>{data.full_name}</h1>
+      <p>{data.tagline}</p>
+    </section>
+  );
+}
+
+// ❌ Bad: Giant component with all sections
+function Template() {
+  return (
+    <div>
+      {/* 500+ lines of code */}
+    </div>
+  );
+}
+```
+
+### Styling Guidelines
+
+```tsx
+// ✅ Good: Tailwind utility classes
+<div className="max-w-4xl mx-auto px-4 py-20">
+  <h1 className="text-4xl font-bold text-foreground">
+    Title
+  </h1>
+</div>
+
+// ❌ Bad: Inline styles
+<div style={{ maxWidth: '1024px', margin: '0 auto', padding: '80px 16px' }}>
+  <h1 style={{ fontSize: '36px', fontWeight: 'bold' }}>
+    Title
+  </h1>
+</div>
+```
+
+### Accessibility Standards
+
+```tsx
+// ✅ Good: Semantic HTML and ARIA
+<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+  </ul>
+</nav>
+
+<img src={profileImg} alt={`${full_name}'s profile photo`} />
+
+<button aria-label="Toggle dark mode" onClick={toggleTheme}>
+  <MoonIcon />
+</button>
+
+// ❌ Bad: No semantic HTML or alt text
+<div onClick={nav}>
+  <div>About</div>
+  <div>Projects</div>
+</div>
+
+<img src={profileImg} />
+
+<div onClick={toggleTheme}>
+  <MoonIcon />
+</div>
+```
+
+### Responsive Design
+
+```tsx
+// ✅ Good: Mobile-first responsive design
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {projects.map(project => (
+    <ProjectCard key={project.id} {...project} />
+  ))}
+</div>
+
+// ✅ Good: Responsive typography
+<h1 className="text-2xl md:text-4xl lg:text-5xl font-bold">
+  {title}
+</h1>
+```
+
+## Adding Template Metadata
+
+Add your template to `packages/templates/src/metaData.ts`:
+
+```typescript packages/templates/src/metaData.ts
+import { Your_Template_Name } from "./Templates";
+
+export const Data: TemplateData[] = [
+  // ... existing templates
+  {
+    id: "your-template-id",
+    title: "Your Template Name",
+    description: "A brief description of your template's unique features and design philosophy.",
+    thumbnail: "URL_TO_DESKTOP_PREVIEW_IMAGE",
+    video: "URL_TO_VIDEO_PREVIEW",
+    component: Your_Template_Name,
+    mobileDevice: "Iphone15Pro", // or "Android"
+    category: "FREE",
+    INRpricing: 0,
+    USDpricing: 0,
+    theme: "both" // or "dark" or "light"
+  }
+];
+```
+
+### Metadata Fields Explained
+
+<AccordionGroup>
+  <Accordion title="id (required)">
+    Unique identifier using kebab-case. Example: `"minimalist-pro"`, `"neon-dreams"`
+  </Accordion>
+  
+  <Accordion title="title (required)">
+    Display name for your template. Keep it short and memorable.
+  </Accordion>
+  
+  <Accordion title="description (required)">
+    1-2 sentence description highlighting unique features. Be concise but descriptive.
+  </Accordion>
+  
+  <Accordion title="thumbnail">
+    URL to desktop preview image (PNG/JPG, recommended 1920x1080). Upload to GitFolio's CDN or provide your own.
+  </Accordion>
+  
+  <Accordion title="video">
+    URL to video preview (MP4). Shows template in action. Optional but recommended.
+  </Accordion>
+  
+  <Accordion title="theme">
+    Theme support: `"dark"`, `"light"`, or `"both"`. Indicates which themes your template supports.
+  </Accordion>
+  
+  <Accordion title="mobileDevice">
+    Preview device for mobile: `"Iphone15Pro"` or `"Android"`
+  </Accordion>
+</AccordionGroup>
+
+## Creating Preview Assets
+
+### Desktop Screenshot
+
+1. Set viewport to 1920x1080
+2. Enable your template with dummy data
+3. Take a clean screenshot
+4. Save as PNG for best quality
+
+### Mobile Screenshot
+
+1. Use browser DevTools device emulation
+2. Select iPhone 15 Pro or Android device
+3. Capture screenshot
+4. Save as PNG
+
+### Video Preview (Optional)
+
+1. Record 10-15 second scrolling demo
+2. Show key sections (hero, projects, experience)
+3. Export as MP4, max 5MB
+4. 1920x1080 resolution recommended
+
+<Note>
+Preview assets will be hosted on GitFolio's CDN after your PR is merged. You can provide temporary URLs in your PR.
+</Note>
+
+## Submitting Your Template
+
+### Pre-submission Checklist
+
+<Steps>
+  <Step title="Code Quality">
+    - [ ] All TypeScript errors resolved
+    - [ ] No ESLint warnings
+    - [ ] Code follows style guide
+    - [ ] Components are properly typed
+  </Step>
+  
+  <Step title="Functionality">
+    - [ ] Template renders with dummy data
+    - [ ] All DATA fields are utilized
+    - [ ] Handles missing/optional data gracefully
+    - [ ] Production build succeeds
+  </Step>
+  
+  <Step title="Design">
+    - [ ] Responsive on mobile (375px, 428px)
+    - [ ] Responsive on tablet (768px, 1024px)
+    - [ ] Responsive on desktop (1440px+)
+    - [ ] Theme switching works (if supported)
+    - [ ] Accessible (keyboard navigation, ARIA labels)
+  </Step>
+  
+  <Step title="Documentation">
+    - [ ] Template added to index.ts
+    - [ ] Metadata added to metaData.ts
+    - [ ] Preview screenshots created
+    - [ ] PR description complete
+  </Step>
+</Steps>
+
+### Create Pull Request
+
+```bash
+# Commit your changes
+git add .
+git commit -m "Add [Template Name] template"
+
+# Push to your fork
+git push origin template/my-awesome-template
+```
+
+Then create a PR on GitHub with:
+
+**Title:** `Add [Your Template Name] Template`
+
+**Description Template:**
+```markdown
+## Template: [Your Template Name]
+
+### Description
+[Brief description of your template]
+
+### Features
+- Feature 1
+- Feature 2
+- Feature 3
+
+### Theme Support
+- [x] Dark mode
+- [x] Light mode
+
+### Preview
+**Desktop:**
+![Desktop Preview](URL_TO_IMAGE)
+
+**Mobile:**
+![Mobile Preview](URL_TO_IMAGE)
+
+### Checklist
+- [x] Follows code style guidelines
+- [x] Fully responsive
+- [x] Accessible (WCAG 2.1 AA)
+- [x] Production build succeeds
+- [x] Handles all DATA fields
+- [x] Preview assets included
+
+### Additional Notes
+[Any special features, dependencies, or considerations]
+```
+
+## Review Process
+
+After submission:
+
+1. **Automated Checks** - CI/CD runs build and lint tests
+2. **Code Review** - Maintainers review code quality and design
+3. **Testing** - Template tested on multiple devices/browsers
+4. **Feedback** - Requested changes or approval
+5. **Asset Upload** - Preview assets uploaded to CDN
+6. **Merge** - Template added to official gallery
+
+<Accordion title="How long does review take?">
+Typically 3-7 days. Complex templates or those needing revisions may take longer. Be responsive to feedback for faster approval.
+</Accordion>
+
+## After Your Template is Merged
+
+### Recognition
+
+- Your template appears in the official GitFolio template gallery
+- Credit given in template metadata and documentation
+- Author attribution in the template showcase
+
+### Maintenance
+
+As a contributor, you may be asked to:
+
+- Fix bugs specific to your template
+- Update template when core types change
+- Respond to user feedback
+
+This is optional but appreciated.
+
+## Common Submission Issues
+
+<AccordionGroup>
+  <Accordion title="Build errors">
+    **Issue:** Template builds locally but fails in CI
+    
+    **Solution:** Run `pnpm run build --filter=renderer` and fix all TypeScript errors. Ensure no warnings in strict mode.
+  </Accordion>
+  
+  <Accordion title="Missing responsiveness">
+    **Issue:** Template looks good on desktop but breaks on mobile
+    
+    **Solution:** Use Tailwind's responsive prefixes (`sm:`, `md:`, `lg:`). Test at all breakpoints.
+  </Accordion>
+  
+  <Accordion title="Accessibility issues">
+    **Issue:** Template fails accessibility review
+    
+    **Solution:** Add alt text to images, use semantic HTML, ensure keyboard navigation, add ARIA labels to interactive elements.
+  </Accordion>
+  
+  <Accordion title="Theme switching problems">
+    **Issue:** Colors don't change when switching themes
+    
+    **Solution:** Use Tailwind's theme-aware classes (`bg-background`, `text-foreground`) or dark mode variants (`dark:bg-gray-900`).
+  </Accordion>
+</AccordionGroup>
+
+## Getting Help
+
+Need assistance with your contribution?
+
+- **GitHub Issues:** Ask questions at [GitFolio Issues](https://github.com/Skb3611/GitFolio/issues)
+- **Discussions:** Join template discussions on GitHub Discussions
+- **Discord:** Join the GitFolio community (if available)
+
+## Code of Conduct
+
+All contributors must:
+
+- Be respectful and professional
+- Accept constructive feedback gracefully
+- Respect maintainer decisions
+- Follow the project's code of conduct
+
+<Note>
+By contributing, you agree that your template will be released under the same open-source license as GitFolio.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Create Your Template" icon="code" href="/templates/creating-templates">
+    Start building your custom template
+  </Card>
+  <Card title="Template Architecture" icon="sitemap" href="/templates/overview">
+    Learn about template structure
+  </Card>
+</CardGroup>

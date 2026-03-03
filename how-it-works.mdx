@@ -1,0 +1,380 @@
+---
+title: How it works
+description: Understand GitFolio's architecture, including GitHub synchronization, portfolio rendering, and the template system.
+---
+
+# How it works
+
+GitFolio is built as a modern monorepo with multiple specialized applications working together to deliver a seamless portfolio experience. This guide explains the core architecture and data flow.
+
+## Architecture overview
+
+GitFolio consists of four main applications:
+
+- **Web app** (`apps/web`) - Main dashboard and authentication built with Next.js 16
+- **Renderer** (`apps/renderer`) - Dedicated portfolio rendering engine
+- **Server** (`apps/server`) - Express.js backend API for data operations
+- **Worker** (`apps/worker`) - Background job processing for scheduled tasks
+
+<Info>
+  All applications are deployed independently and communicate via REST APIs, allowing for horizontal scaling and isolated deployments.
+</Info>
+
+## GitHub synchronization
+
+GitFolio uses the GitHub REST API to fetch and sync your profile data. Here's how it works:
+
+### Initial onboarding flow
+
+When you complete onboarding, GitFolio performs the following steps:
+
+<Steps>
+  <Step title="Authentication">
+    Depending on your sign-up method:
+
+    - **GitHub OAuth**: GitFolio obtains an OAuth access token from Clerk, which is used to make authenticated requests to the GitHub API on your behalf
+    - **Google/Email**: GitFolio uses a service account token to make public API requests to GitHub
+
+    The service uses the `@clerk/backend` SDK to securely manage OAuth tokens.
+  </Step>
+
+  <Step title="Fetch user details">
+    GitFolio calls the GitHub API endpoint:
+
+    ```typescript
+    // For OAuth users
+    GET https://api.github.com/user
+    
+    // For public profiles
+    GET https://api.github.com/users/{username}
+    ```
+
+    This retrieves:
+    - Username
+    - Bio
+    - Location
+    - Website URL
+    - Followers/following counts
+    - Profile creation date
+    - Avatar URL
+
+    All data is mapped and stored in the `User` table in the PostgreSQL database.
+  </Step>
+
+  <Step title="Fetch repositories">
+    GitFolio fetches all your repositories:
+
+    ```typescript
+    // For OAuth users
+    GET https://api.github.com/user/repos
+    
+    // For public profiles
+    GET https://api.github.com/users/{username}/repos
+    ```
+
+    For each repository, GitFolio makes additional API calls to fetch:
+    - **Languages**: Via the `languages_url` endpoint to get language breakdown
+    - **Deployments**: Via the `deployments_url` endpoint to count active deployments
+
+    Repository data stored includes:
+    - Name, description, and topics
+    - Stars, forks, and deployment counts
+    - Repository and homepage links
+    - Creation, update, and last push timestamps
+    - Language composition (stored as JSON)
+
+    All repositories are created in the `Repo` table with a foreign key to your user ID.
+  </Step>
+
+  <Step title="Update onboarding status">
+    Once all data is successfully synced:
+
+    - The `onBoardingStatus` field in your User record is set to `true`
+    - Your Clerk user metadata is updated with `onBoarding: true`
+    - You're redirected to the dashboard
+  </Step>
+</Steps>
+
+<Note>
+  The entire onboarding sync process is handled by the `onBoardingProcess` function in `apps/server/src/Services/onboarding.service.ts`.
+</Note>
+
+### Automated daily sync
+
+GitFolio runs a scheduled cron job to keep your user data synchronized:
+
+```typescript
+// Runs daily at midnight
+cron.schedule('0 0 * * *', syncUsers)
+```
+
+This job:
+1. Fetches all users from Clerk (the authentication provider)
+2. Compares with users in the GitFolio database
+3. Creates missing user records
+4. Sends welcome emails to new users via a Bull queue
+
+<Warning>
+  The daily sync only adds new users. To update your repositories or profile data, you'll need to make changes through the dashboard, which triggers immediate API calls to update the database.
+</Warning>
+
+## Portfolio rendering system
+
+When someone visits your portfolio at `portfolio.gitfolio.in/{username}`, here's what happens:
+
+### Data fetching
+
+<Steps>
+  <Step title="Server request">
+    The renderer app (`apps/renderer`) makes a request to the backend API:
+
+    ```typescript
+    GET /api/v1/renderer/{username}
+    ```
+
+    This endpoint (`apps/server/src/Controllers/renderer.controller.ts`) queries the database for:
+    - User profile information
+    - All repositories where `isIncluded = true`
+    - Work experience entries
+    - Education history
+    - Social links (stored as JSON)
+    - Skills array
+  </Step>
+
+  <Step title="Data transformation">
+    The raw database records are transformed into a standardized `DATA` type structure:
+
+    ```typescript
+    {
+      personalInfo: PersonalInformation,
+      projects: Projects[],
+      experience: Experience[],
+      education: Education[],
+      socialLinks: SocialLinks,
+      skills: string[]
+    }
+    ```
+
+    This ensures a consistent interface for all templates.
+  </Step>
+
+  <Step title="Template selection">
+    The renderer looks up your active template ID from `personalInfo.activeTemplateId` and matches it against the template registry in `packages/templates/src/metaData.ts`.
+
+    If no template is set or the template isn't found, a "No Template Activated" error is displayed.
+  </Step>
+
+  <Step title="Component rendering">
+    The selected template component is dynamically rendered with your data:
+
+    ```tsx
+    <Component data={data} />
+    ```
+
+    Each template is a self-contained React component that receives the standardized data structure and renders your portfolio.
+  </Step>
+</Steps>
+
+### SEO and metadata
+
+Every portfolio page generates dynamic metadata for SEO and social sharing:
+
+```typescript
+export async function generateMetadata({ params }): Promise<Metadata> {
+  // Fetches user data
+  // Generates OpenGraph image via /api/og route
+  // Returns metadata with title, description, og:image, twitter:card
+}
+```
+
+This ensures:
+- Search engines can properly index your portfolio
+- Social media platforms display rich previews with your name and avatar
+- Each page has unique title and description tags
+
+## Template system
+
+GitFolio's template system is built on a plugin-like architecture:
+
+### Template structure
+
+Each template lives in `packages/templates/src/Templates/{TemplateName}/` and consists of:
+
+- **Template.tsx** - The main React component that receives portfolio data
+- **Components/** - Template-specific UI components
+
+Templates are registered in the metadata file with:
+
+```typescript
+{
+  id: "template-slug",
+  title: "Display Name",
+  description: "Template description",
+  component: TemplateComponent,
+  category: "FREE" | "PREMIUM",
+  theme: "light" | "dark" | "both",
+  thumbnail: "preview-image-url",
+  video: "preview-video-url"
+}
+```
+
+### Theme support
+
+Templates can support:
+- **Light only** - Single light color scheme
+- **Dark only** - Single dark color scheme
+- **Both** - Toggleable light/dark modes using `next-themes`
+
+The theme system uses CSS variables and Tailwind's dark mode support for seamless switching.
+
+### Template activation
+
+When you activate a template:
+
+1. Dashboard sends a POST request to update your user record:
+   ```typescript
+   POST /api/v1/user/update
+   Body: { activeTemplateId: "template-slug" }
+   ```
+
+2. The `activeTemplateId` field in your User record is updated
+
+3. Next time someone views your portfolio, the new template is rendered
+
+<Info>
+  Template changes are instant. No build or deployment process is required.
+</Info>
+
+## Data storage
+
+GitFolio uses PostgreSQL with Prisma ORM. Key database models:
+
+### User model
+
+```prisma
+model User {
+  id                String      @id
+  username          String?     @unique
+  email             String      @unique
+  firstname         String
+  lastname          String
+  profileImg        String
+  bio               String?
+  tagline           String?
+  location          String?
+  website           String?
+  githubLink        String?
+  followers         Int         @default(0)
+  following         Int         @default(0)
+  activeTemplateId  String?
+  socialAccounts    Json?
+  skills            String[]
+  onBoardingStatus  Boolean     @default(false)
+  
+  repos             Repo[]
+  experiences       Experience[]
+  educations        Education[]
+}
+```
+
+### Repository model
+
+```prisma
+model Repo {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  topics      String[]
+  languages   Json
+  stars       Int      @default(0)
+  forks       Int      @default(0)
+  repoLink    String
+  liveLink    String?
+  thumbnail   String?
+  isPinned    Boolean  @default(false)
+  isIncluded  Boolean  @default(true)
+  userId      String
+}
+```
+
+<Note>
+  The `isIncluded` flag allows you to hide repositories from your portfolio without deleting them from the database.
+</Note>
+
+## Image uploads and storage
+
+Custom images (profile pictures, project thumbnails, company logos) are stored in AWS S3:
+
+<Steps>
+  <Step title="Request presigned URL">
+    Dashboard requests a presigned upload URL from the server:
+
+    ```typescript
+    POST /api/v1/s3/upload
+    Body: { type: 'Projects', filename: 'project-id.jpg' }
+    ```
+  </Step>
+
+  <Step title="Upload to S3">
+    The client receives a presigned URL and uploads the image directly to S3:
+
+    ```typescript
+    PUT {presigned-url}
+    Body: image file
+    ```
+
+    This bypasses the server for large file uploads, improving performance.
+  </Step>
+
+  <Step title="Save URL to database">
+    After successful upload, the dashboard saves the S3 URL to the appropriate database field (`thumbnail`, `logo`, `profileImg`).
+  </Step>
+</Steps>
+
+<Info>
+  Presigned URLs are generated using the `@aws-sdk/s3-request-presigner` package and are valid for a limited time for security.
+</Info>
+
+## Authentication flow
+
+GitFolio uses Clerk for authentication with JWT-based API authorization:
+
+1. User signs in via Clerk (GitHub OAuth, Google, or Email)
+2. Clerk issues a session token
+3. Dashboard requests a JWT token: `await getToken()`
+4. All API requests include: `Authorization: Bearer {token}`
+5. Server validates tokens using `@clerk/backend` middleware
+6. Invalid tokens return 401 Unauthorized
+
+<Warning>
+  If you're signed out unexpectedly, your session token may have expired. Simply sign in again to continue.
+</Warning>
+
+## Technology stack
+
+GitFolio is built with modern technologies:
+
+- **Frontend**: React 19, Next.js 16, TailwindCSS 4
+- **Backend**: Express.js, Node.js
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: Clerk
+- **Storage**: AWS S3 with CloudFront
+- **Deployment**: Vercel (frontend), Railway/Render (backend)
+- **Package manager**: pnpm workspaces (monorepo)
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Dashboard guide" icon="gauge" href="/guides/manage-content">
+    Learn to use all dashboard features
+  </Card>
+  <Card title="API reference" icon="code" href="/api/overview">
+    Explore GitFolio's REST API endpoints
+  </Card>
+  <Card title="Template development" icon="palette" href="/templates/creating-templates">
+    Build your own custom templates
+  </Card>
+  <Card title="FAQ" icon="wrench" href="/community/faq">
+    Common issues and solutions
+  </Card>
+</CardGroup>

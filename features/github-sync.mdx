@@ -1,0 +1,337 @@
+---
+title: GitHub sync
+description: Automatic synchronization of your GitHub profile, repositories, and activity
+---
+
+## Overview
+
+GitFolio automatically syncs your GitHub data to keep your portfolio up-to-date. When you sign in with GitHub, GitFolio fetches your profile information, repositories, and contribution history through the GitHub API.
+
+## How GitHub sync works
+
+<Steps>
+  <Step title="Authentication">
+    You authenticate with GitHub OAuth, granting GitFolio read access to your public profile and repositories.
+  </Step>
+  <Step title="Initial sync">
+    During onboarding, GitFolio fetches your complete GitHub profile and repository data.
+  </Step>
+  <Step title="Data storage">
+    Your data is stored in GitFolio's database for fast portfolio rendering.
+  </Step>
+  <Step title="Ongoing updates">
+    You can manually refresh your data anytime from the dashboard.
+  </Step>
+</Steps>
+
+## Profile data sync
+
+GitFolio syncs these profile fields from your GitHub account:
+
+<Tabs>
+  <Tab title="Personal information">
+    ```typescript
+    // From github.service.ts
+    const userDetails = {
+      username: data.login,
+      bio: data.bio,
+      location: data.location,
+      website: data.blog,
+      githubLink: data.html_url,
+      followers: data.followers,
+      following: data.following,
+      avatar_url: data.avatar_url,
+      created_at: data.created_at,
+      updated_at: data.updated_at
+    };
+    ```
+
+    This data populates your portfolio's hero section and profile card.
+  </Tab>
+  <Tab title="Repository data">
+    ```typescript
+    // Repository sync from github.service.ts
+    const repos = data.map(async (repo) => ({
+      name: repo.name,
+      description: repo.description,
+      topics: repo.topics,
+      languages: await getLanguages({ token, url: repo.languages_url }),
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      deployments: await getDeployments({ token, url: repo.deployments_url }),
+      repoLink: repo.html_url,
+      liveLink: repo.homepage,
+      created_at: repo.created_at,
+      updated_at: repo.updated_at,
+      pushed_at: repo.pushed_at
+    }));
+    ```
+  </Tab>
+</Tabs>
+
+## Repository sync
+
+GitFolio fetches all your public repositories with detailed information:
+
+### Repository fields
+
+| Field | Source | Description |
+|-------|--------|-------------|
+| `name` | `repo.name` | Repository name |
+| `description` | `repo.description` | Project description |
+| `topics` | `repo.topics` | GitHub topics/tags |
+| `languages` | Languages API | Programming languages with byte counts |
+| `stars` | `repo.stargazers_count` | Number of stars |
+| `forks` | `repo.forks_count` | Number of forks |
+| `deployments` | Deployments API | Active deployment count |
+| `repoLink` | `repo.html_url` | GitHub repository URL |
+| `liveLink` | `repo.homepage` | Live demo URL (if set) |
+
+### Language detection
+
+GitFolio fetches programming language data for each repository:
+
+```typescript
+// From github.service.ts
+const getLanguages = async ({ token, url }) => {
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const languages = await res.json();
+  return languages; // { "TypeScript": 45032, "JavaScript": 12843, ... }
+};
+```
+
+Languages are displayed as badges on project cards in your portfolio.
+
+<Note>
+Language data is calculated by GitHub based on the number of bytes of code in each language.
+</Note>
+
+## Contribution graph sync
+
+GitFolio syncs your entire GitHub contribution history using the GitHub GraphQL API:
+
+```typescript
+// From github.service.ts
+export const getUserContributionsGraph = async (
+  token: string,
+  username: string,
+  createdAt: string
+) => {
+  const firstContributionYear = getYear(parseISO(createdAt));
+  const currentYear = getYear(new Date());
+  const allContributions = [];
+
+  // Fetch contributions year by year
+  for (let year = firstContributionYear; year <= currentYear; year++) {
+    const yearStart = startOfYear(new Date(year, 0, 1));
+    const yearEnd = endOfYear(new Date(year, 0, 1));
+
+    const contributionsQuery = `
+      query UserContributions($username: String!, $from: DateTime, $to: DateTime) {
+        user(login: $username) {
+          contributionsCollection(from: $from, to: $to) {
+            contributionCalendar {
+              totalContributions
+              weeks {
+                contributionDays {
+                  color
+                  contributionCount
+                  date
+                  weekday
+                }
+                firstDay
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const yearData = await makeGraphQLQuery(token, contributionsQuery, {
+      username,
+      from: format(yearStart, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+      to: format(yearEnd, "yyyy-MM-dd'T'HH:mm:ssXXX")
+    });
+
+    allContributions.push({ year, data: yearData });
+  }
+
+  return allContributions;
+};
+```
+
+This powers the contribution calendar visualization in templates like Pixel Perfect.
+
+## Data persistence
+
+Synced data is stored in the PostgreSQL database:
+
+```prisma
+model User {
+  id           String   @id
+  username     String?  @unique
+  firstname    String
+  lastname     String
+  email        String   @unique
+  profileImg   String
+  bio          String?
+  tagline      String?
+  location     String?
+  website      String?
+  githubLink   String?
+  followers    Int      @default(0)
+  following    Int      @default(0)
+  skills       String[]
+  repos        Repo[]
+  experiences  Experience[]
+  educations   Education[]
+}
+
+model Repo {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  topics      String[]
+  languages   Json
+  stars       Int       @default(0)
+  forks       Int       @default(0)
+  deployments Int       @default(0)
+  thumbnail   String?
+  repoLink    String
+  liveLink    String?
+  isPinned    Boolean   @default(false)
+  isIncluded  Boolean   @default(true)
+  userId      String
+  owner       User      @relation(fields: [userId], references: [id])
+}
+```
+
+## Repository management
+
+After syncing, you have full control over which repositories appear in your portfolio:
+
+### Include/exclude repositories
+
+Each repository has an `isIncluded` flag:
+
+```typescript
+// From dashboard.service.ts
+export const createOrUpdateRepo = async (userId: string, data: Repo) => {
+  await prisma.repo.upsert({
+    where: { id: data.id },
+    update: { ...data },
+    create: { ...data, userId, isIncluded: true } // Default to included
+  });
+};
+```
+
+Toggle this in the **Projects** tab to show/hide repositories from your portfolio.
+
+### Pin repositories
+
+Mark important repositories as pinned to feature them prominently:
+
+```prisma
+model Repo {
+  isPinned    Boolean   @default(false)
+  isIncluded  Boolean   @default(true)
+}
+```
+
+## Manual data refresh
+
+<Accordion title="Refreshing your GitHub data">
+  While GitFolio doesn't automatically poll GitHub for updates, you can manually refresh your data:
+
+  1. Navigate to the dashboard
+  2. GitFolio fetches the latest data on each dashboard load
+  3. New repositories are automatically added
+  4. Updated repository data (stars, forks, etc.) is refreshed
+
+  The dashboard fetches data using:
+
+  ```typescript
+  // From dashboard/page.tsx
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await getToken();
+      const res = await fetch(config.server_endpoints.GET_USER_DATA, {
+        headers: { authorization: `Bearer ${token}` },
+        credentials: "include"
+      });
+      const result = await res.json();
+      // Update state with fresh data
+    };
+    fetchData();
+  }, []);
+  ```
+</Accordion>
+
+## Authentication flow
+
+GitFolio uses Clerk for authentication with GitHub OAuth:
+
+<Steps>
+  <Step title="OAuth redirect">
+    User clicks "Sign in with GitHub" and is redirected to GitHub's OAuth page
+  </Step>
+  <Step title="Authorization grant">
+    User authorizes GitFolio to read their public profile and repositories
+  </Step>
+  <Step title="User creation">
+    Clerk receives the OAuth token and creates a user account
+  </Step>
+  <Step title="Data sync">
+    GitFolio's user sync service runs daily to sync new users:
+
+    ```typescript
+    // From UserSync.service.ts
+    corn.schedule("0 0 * * *", syncUsers); // Daily at midnight
+    ```
+  </Step>
+  <Step title="Onboarding">
+    New users are directed to onboarding to complete their profile setup
+  </Step>
+</Steps>
+
+## API rate limits
+
+GitFolio respects GitHub's API rate limits:
+
+<Note>
+**Authenticated requests:** 5,000 requests per hour
+
+**GraphQL API:** 5,000 points per hour
+
+GitFolio uses authenticated requests with your OAuth token to maximize available quota.
+</Note>
+
+## Privacy and security
+
+<CardGroup cols={2}>
+  <Card title="Read-only access" icon="lock">
+    GitFolio only requests read access to your public repositories and profile. It cannot modify your GitHub account.
+  </Card>
+  <Card title="Token security" icon="shield">
+    OAuth tokens are securely stored and never exposed in your portfolio or client-side code.
+  </Card>
+  <Card title="Data control" icon="sliders">
+    You control which repositories and information appear on your portfolio through the dashboard.
+  </Card>
+  <Card title="Account deletion" icon="trash">
+    Deleting your GitFolio account removes all synced data from our database.
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Customize your portfolio" icon="palette" href="/features/customization">
+    Learn how to customize the data displayed in your portfolio
+  </Card>
+  <Card title="Choose a template" icon="layout" href="/features/templates">
+    Select a template to showcase your GitHub data
+  </Card>
+</CardGroup>

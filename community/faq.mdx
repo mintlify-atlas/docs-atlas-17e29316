@@ -1,0 +1,336 @@
+---
+title: Frequently Asked Questions
+description: Common questions about contributing to GitFolio, development setup, and creating templates.
+---
+
+Find answers to common questions about GitFolio development and contributions.
+
+## General Questions
+
+<Accordion title="What is GitFolio?">
+  GitFolio is an open-source portfolio builder that transforms your GitHub profile into a professional website. It automatically syncs with your GitHub data and provides beautiful, customizable templates to showcase your work.
+  
+  Key features:
+  - Automatic GitHub synchronization
+  - Professional portfolio templates
+  - Zero coding required for end users
+  - Responsive and mobile-friendly
+  - SEO optimized
+</Accordion>
+
+<Accordion title="Is GitFolio free to use?">
+  Yes! GitFolio is completely free and open-source under the MIT License. You can use it, modify it, and contribute to it without any cost.
+</Accordion>
+
+<Accordion title="Who maintains GitFolio?">
+  GitFolio is maintained by Shubham Bhilare and the open-source community. Contributions from developers worldwide help improve the project.
+</Accordion>
+
+<Accordion title="Can I use GitFolio for commercial projects?">
+  Yes! GitFolio is licensed under the MIT License, which allows commercial use. You can use it for personal portfolios, client projects, or any other purpose.
+</Accordion>
+
+## Contributing
+
+<Accordion title="How can I contribute to GitFolio?">
+  There are several ways to contribute:
+  
+  - **Create Templates** - Design new portfolio templates
+  - **Fix Bugs** - Help resolve issues
+  - **Add Features** - Implement new functionality
+  - **Improve Documentation** - Enhance guides and tutorials
+  - **Report Issues** - Share bugs or suggestions
+  
+  Start with our [Contributing Guide](/community/contributing) for detailed instructions.
+</Accordion>
+
+<Accordion title="Do I need permission to contribute?">
+  No! GitFolio is open-source. You can fork the repository, make changes, and submit a pull request. Just follow our contribution guidelines and code standards.
+</Accordion>
+
+<Accordion title="How long does it take to get my PR reviewed?">
+  Maintainers typically review pull requests within a few days. Complex changes may take longer. Be patient and responsive to feedback during the review process.
+</Accordion>
+
+<Accordion title="Will I get credit for my contributions?">
+  Absolutely! All contributors are credited for their work. Template creators will have their names associated with their templates in the GitFolio gallery.
+</Accordion>
+
+<Accordion title="What if my PR is rejected?">
+  Don't be discouraged! Rejections usually come with feedback explaining what needs to change. You can make adjustments and resubmit. Common reasons for rejection:
+  
+  - Doesn't follow code style guidelines
+  - Missing responsive design
+  - Accessibility issues
+  - Build errors
+  - Incomplete testing
+</Accordion>
+
+## Development Setup
+
+<Accordion title="What are the system requirements?">
+  To develop for GitFolio, you need:
+  
+  - **Node.js** version 20 or higher
+  - **pnpm** version 10.4.1 or higher
+  - **Git** for version control
+  - At least 4GB of RAM
+  - 2GB of free disk space
+  
+  See our [Development Setup](/community/development-setup) guide for details.
+</Accordion>
+
+<Accordion title="Why does GitFolio use pnpm instead of npm or yarn?">
+  pnpm is faster and more efficient than npm or yarn, especially for monorepos. It uses a unique approach to storing dependencies that:
+  
+  - Saves disk space
+  - Speeds up installations
+  - Prevents phantom dependencies
+  - Works better with workspace features
+</Accordion>
+
+<Accordion title="What is Turborepo and why is it used?">
+  Turborepo is a build system for monorepos that makes development faster through:
+  
+  - **Smart caching** - Reuses previous build results
+  - **Parallel execution** - Runs tasks concurrently
+  - **Dependency awareness** - Builds packages in correct order
+  - **Remote caching** - Shares cache across team members
+  
+  This makes builds much faster in GitFolio's monorepo structure.
+</Accordion>
+
+<Accordion title="How do I run only specific packages?">
+  Use the `--filter` flag with Turborepo:
+  
+  ```bash
+  # Run dev server for renderer only
+  pnpm run dev --filter=renderer
+  
+  # Build templates package only
+  pnpm run build --filter=@workspace/templates
+  
+  # Lint playground app only
+  pnpm run lint --filter=playground
+  ```
+</Accordion>
+
+<Accordion title="Why is my build failing?">
+  Common causes of build failures:
+  
+  1. **TypeScript errors** - Check for type issues in your code
+  2. **Missing dependencies** - Run `pnpm install`
+  3. **Outdated cache** - Clear Turborepo cache: `rm -rf .turbo`
+  4. **Node version** - Ensure you're using Node 20+
+  5. **Environment variables** - Check `.env` file is configured
+  
+  Run `pnpm run build` to see detailed error messages.
+</Accordion>
+
+## Template Development
+
+<Accordion title="What makes a good portfolio template?">
+  A great template should be:
+  
+  - **Visually appealing** - Clean, modern design
+  - **Responsive** - Works on all screen sizes
+  - **Accessible** - Usable by everyone, including those with disabilities
+  - **Performant** - Fast loading and smooth animations
+  - **Customizable** - Adapts to different data and preferences
+  - **Well-coded** - Follows TypeScript and React best practices
+</Accordion>
+
+<Accordion title="Can I use external libraries in my template?">
+  Yes, but with caution. Prefer to use:
+  
+  - Libraries already in the project (React, Tailwind CSS, next-themes)
+  - Lightweight, well-maintained packages
+  - Libraries that don't significantly increase bundle size
+  
+  Always discuss major dependency additions with maintainers first.
+</Accordion>
+
+<Accordion title="How do I test my template with different data?">
+  GitFolio provides `DummyData` for testing. You can also:
+  
+  1. Modify the dummy data to test edge cases
+  2. Create multiple data sets for testing
+  3. Test with minimal data (empty arrays, missing fields)
+  4. Test with maximum data (many projects, long descriptions)
+  
+  ```tsx
+  const template = ({ data = DummyData }: { data: DATA }) => {
+    // Your template uses the data prop
+  };
+  ```
+</Accordion>
+
+<Accordion title="What data is available to templates?">
+  Templates receive a `DATA` object containing:
+  
+  - User profile information (name, bio, avatar)
+  - Repositories and projects
+  - GitHub statistics
+  - Social links
+  - Skills and technologies
+  - Experience and education
+  
+  Import the type from `@workspace/types` to see all available fields.
+</Accordion>
+
+<Accordion title="Can I use animations in my template?">
+  Yes! You can use:
+  
+  - **CSS transitions** - Simple hover effects and transitions
+  - **Tailwind transitions** - Built-in transition utilities
+  - **Framer Motion** - If approved by maintainers
+  
+  Keep animations subtle and performant. Avoid excessive or distracting animations.
+</Accordion>
+
+<Accordion title="How do I handle dark mode?">
+  Use the `next-themes` library:
+  
+  ```tsx
+  import { useTheme } from "next-themes";
+  
+  const Template = ({ data }) => {
+    const { setTheme } = useTheme();
+    
+    React.useEffect(() => {
+      setTheme("dark"); // Set default theme
+    }, []);
+    
+    return (
+      <div className="bg-white dark:bg-gray-900">
+        {/* Content with dark mode classes */}
+      </div>
+    );
+  };
+  ```
+</Accordion>
+
+## Code Style
+
+<Accordion title="Does GitFolio use ESLint?">
+  Yes! GitFolio uses ESLint for code quality. Run `pnpm run lint` to check for issues. The project includes a shared ESLint configuration in `packages/eslint-config`.
+</Accordion>
+
+<Accordion title="How is code formatted?">
+  GitFolio uses Prettier for consistent code formatting. Run `pnpm run format` to format all files. Code is automatically formatted according to project standards.
+</Accordion>
+
+<Accordion title="Are there pre-commit hooks?">
+  Check the project's Git hooks configuration. Many projects use Husky for pre-commit hooks that:
+  
+  - Run linting
+  - Format code
+  - Run tests
+  - Validate commit messages
+</Accordion>
+
+<Accordion title="What naming conventions should I follow?">
+  - **Components** - PascalCase (e.g., `ProjectCard`, `Header`)
+  - **Files** - PascalCase for components (e.g., `Header.tsx`)
+  - **Variables/Functions** - camelCase (e.g., `userData`, `handleClick`)
+  - **Constants** - UPPER_SNAKE_CASE (e.g., `MAX_ITEMS`, `API_URL`)
+  - **Types/Interfaces** - PascalCase (e.g., `TemplateProps`, `UserData`)
+</Accordion>
+
+## Monorepo Structure
+
+<Accordion title="What is a monorepo?">
+  A monorepo is a single repository containing multiple related projects. GitFolio uses a monorepo to organize:
+  
+  - **apps/** - Main applications (renderer, playground)
+  - **packages/** - Shared code (templates, types, config)
+  
+  This structure allows code sharing and coordinated development.
+</Accordion>
+
+<Accordion title="What are workspace packages?">
+  Workspace packages are internal packages in the monorepo:
+  
+  - `@workspace/templates` - Portfolio templates
+  - `@workspace/types` - Shared TypeScript types
+  - `@workspace/eslint-config` - ESLint configuration
+  - `@workspace/typescript-config` - TypeScript configuration
+  
+  These can be imported by any app in the monorepo.
+</Accordion>
+
+<Accordion title="How do packages depend on each other?">
+  Packages can depend on other workspace packages:
+  
+  ```json
+  {
+    "dependencies": {
+      "@workspace/types": "workspace:*",
+      "@workspace/templates": "workspace:*"
+    }
+  }
+  ```
+  
+  Turborepo ensures they're built in the correct order.
+</Accordion>
+
+## Deployment
+
+<Accordion title="How do I deploy my changes?">
+  You don't! As a contributor, you only need to:
+  
+  1. Create your template or feature
+  2. Test it locally
+  3. Submit a pull request
+  
+  Maintainers handle all deployment, publishing, and hosting.
+</Accordion>
+
+<Accordion title="Where is GitFolio hosted?">
+  The main GitFolio application is hosted by the maintainers. As a contributor, you don't need to worry about hosting - just focus on creating great templates and features.
+</Accordion>
+
+## Getting Help
+
+<Accordion title="Where can I get help?">
+  Several resources are available:
+  
+  - **Documentation** - Check our guides and tutorials
+  - **GitHub Issues** - Search for similar questions
+  - **GitHub Discussions** - Ask the community
+  - **Support Channels** - See our [Support page](/community/support)
+</Accordion>
+
+<Accordion title="How do I report a bug?">
+  Report bugs on GitHub Issues:
+  
+  1. Check if the bug is already reported
+  2. Create a new issue with:
+     - Clear title and description
+     - Steps to reproduce
+     - Expected vs actual behavior
+     - Screenshots if applicable
+     - Environment details (OS, Node version, etc.)
+</Accordion>
+
+<Accordion title="Can I request a new feature?">
+  Yes! Submit feature requests on GitHub:
+  
+  1. Check if the feature is already requested
+  2. Create an issue explaining:
+     - What problem it solves
+     - How it would work
+     - Why it would benefit users
+     - Any implementation ideas
+</Accordion>
+
+## Still Have Questions?
+
+If you didn't find your answer here:
+
+- Check our [Development Setup](/community/development-setup) guide
+- Review the [Contributing Guidelines](/community/contributing)
+- Read the [Code Style Guide](/community/code-style)
+- Visit our [Support page](/community/support) for help channels
+
+We're here to help you contribute successfully to GitFolio!

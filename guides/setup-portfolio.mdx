@@ -1,0 +1,178 @@
+---
+title: Set up your portfolio
+description: Complete guide to onboarding and connecting your GitHub account to GitFolio
+---
+
+## Overview
+
+GitFolio transforms your GitHub profile into a professional portfolio website. This guide walks you through the complete onboarding process, from signing in to accessing your dashboard.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- A GitHub account with public repositories
+- A valid email address
+- A web browser (Chrome, Firefox, Safari, or Edge)
+
+## Sign in to GitFolio
+
+<Steps>
+  <Step title="Navigate to GitFolio">
+    Visit the GitFolio homepage and click the **Sign In** button in the top navigation bar.
+  </Step>
+
+  <Step title="Choose your authentication method">
+    GitFolio supports three sign-in options:
+
+    <Tabs>
+      <Tab title="GitHub (Recommended)">
+        Sign in directly with your GitHub account for automatic data syncing.
+        
+        - Click **Continue with GitHub**
+        - Authorize GitFolio to access your public profile and repositories
+        - Your GitHub data will be automatically imported
+      </Tab>
+
+      <Tab title="Google">
+        Use your Google account for quick authentication.
+        
+        - Click **Continue with Google**
+        - You'll need to manually provide your GitHub URL during onboarding
+      </Tab>
+
+      <Tab title="Email">
+        Create an account with your email address.
+        
+        - Enter your email and create a password
+        - Verify your email address
+        - You'll need to manually provide your GitHub URL during onboarding
+      </Tab>
+    </Tabs>
+  </Step>
+</Steps>
+
+## Connect your GitHub profile
+
+After signing in, you'll be redirected to the onboarding page to connect your GitHub account.
+
+<Steps>
+  <Step title="Enter your GitHub URL">
+    On the onboarding screen, you'll see a form asking for your GitHub profile URL.
+
+    ```
+    www.github.com/username
+    ```
+
+    <Info>
+      If you signed in with GitHub, your username will be pre-filled. You can modify it if needed.
+    </Info>
+
+    Enter your GitHub URL in the format `www.github.com/username` and click **Continue**.
+  </Step>
+
+  <Step title="Data analysis and import">
+    GitFolio will now fetch and analyze your GitHub data:
+
+    - **User details** - Profile picture, bio, location, followers, following
+    - **Repositories** - All public repositories with metadata
+    - **Repository metadata** - Stars, forks, languages, topics, deployment links
+
+    <Note>
+      This process typically takes 10-30 seconds depending on the number of repositories. You'll see a progress indicator showing:
+      - Fetching User Details...
+      - Fetching Repositories...
+      - Processing Data...
+    </Note>
+  </Step>
+
+  <Step title="Onboarding complete">
+    Once the import is complete, you'll see a success message: **Setup Complete!**
+
+    Click **Continue to Dashboard** to access your portfolio management interface.
+  </Step>
+</Steps>
+
+## What data is imported?
+
+During onboarding, GitFolio imports the following from your GitHub profile:
+
+### Profile information
+
+- Username (automatically converted to lowercase)
+- Profile image
+- Bio
+- Location
+- Website URL
+- GitHub profile link
+- Follower and following counts
+
+### Repository data
+
+For each public repository:
+
+- Repository name
+- Description
+- Topics/tags
+- Programming languages (with percentage breakdown)
+- Star count
+- Fork count
+- Repository URL
+- Live deployment URL (if available)
+- Creation, update, and last push dates
+
+<Info>
+  All repositories are set to "included" by default. You can customize which repositories appear in your portfolio from the dashboard.
+</Info>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Error: User already exists with the following link">
+    This error occurs when you sign in with Google or Email, and another user has already claimed the GitHub username you're trying to connect.
+
+    **Solution:** Ensure you're using the correct GitHub URL. If you previously created an account with GitHub authentication, sign in using that method instead.
+  </Accordion>
+
+  <Accordion title="Error: Invalid GitHub URL">
+    The GitHub URL format is incorrect.
+
+    **Solution:** Use the exact format `www.github.com/username` or `https://github.com/username`. Do not include extra paths like repository names.
+  </Accordion>
+
+  <Accordion title="Failed to fetch data">
+    GitFolio couldn't retrieve your GitHub data.
+
+    **Possible causes:**
+    - The GitHub username doesn't exist
+    - Your GitHub profile is private
+    - Network connectivity issues
+    - GitHub API rate limits
+
+    **Solution:** Verify your username is correct and your profile is public. Wait a few moments and try again.
+  </Accordion>
+
+  <Accordion title="No repositories imported">
+    Your profile was imported but no repositories were found.
+
+    **Possible causes:**
+    - You have no public repositories
+    - All your repositories are private or archived
+
+    **Solution:** You can manually add projects from the dashboard after onboarding.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+After completing the onboarding process:
+
+<CardGroup cols={2}>
+  <Card title="Customize your template" icon="palette" href="/guides/customize-template">
+    Choose and customize a portfolio template that matches your style
+  </Card>
+  
+  <Card title="Manage your content" icon="pen-to-square" href="/guides/manage-content">
+    Edit your profile, add experiences, education, and skills
+  </Card>
+</CardGroup>

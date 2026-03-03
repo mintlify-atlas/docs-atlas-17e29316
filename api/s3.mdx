@@ -1,0 +1,409 @@
+---
+title: 'S3 File Upload API'
+description: 'Generate pre-signed URLs for secure file uploads to S3'
+---
+
+## Overview
+
+The S3 API provides secure file upload functionality using pre-signed URLs. This allows users to upload images and files directly to Amazon S3 without exposing credentials.
+
+<Note>
+  All S3 endpoints require authentication. Include your Clerk JWT token in the `Authorization` header.
+</Note>
+
+## Generate Pre-Signed URL
+
+Generate a pre-signed URL for uploading files to S3.
+
+```http
+POST /api/v1/s3/generatePreSignedURL
+```
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from Clerk authentication
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`
+</ParamField>
+
+### Request Body
+
+<ParamField body="type" type="string" required>
+  The type of file being uploaded. Determines the S3 folder structure.
+  
+  Common types:
+  - `profile` - Profile images/avatars
+  - `repo` - Repository thumbnails
+  - `company` - Company logos (for experience)
+  - `institution` - Institution logos (for education)
+  - `project` - Project screenshots or images
+</ParamField>
+
+<ParamField body="filename" type="string" required>
+  The name of the file to upload, including extension
+  
+  Examples:
+  - `avatar.jpg`
+  - `project-screenshot.png`
+  - `company-logo.svg`
+</ParamField>
+
+### Response
+
+<ResponseField name="status" type="string">
+  `success` or `error`
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable status message
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Pre-signed URL data
+  
+  <Expandable title="Pre-signed URL properties">
+    <ResponseField name="uploadURL" type="string">
+      The pre-signed URL to use for uploading the file via PUT request
+    </ResponseField>
+    
+    <ResponseField name="fileURL" type="string">
+      The permanent URL where the file will be accessible after upload
+    </ResponseField>
+    
+    <ResponseField name="key" type="string">
+      The S3 object key (path) for the uploaded file
+    </ResponseField>
+    
+    <ResponseField name="expiresIn" type="number">
+      Number of seconds until the pre-signed URL expires (typically 300 = 5 minutes)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Request
+
+```bash
+curl -X POST https://api.gitfolio.in/api/v1/s3/generatePreSignedURL \
+  -H "Authorization: Bearer your_clerk_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "profile",
+    "filename": "avatar.jpg"
+  }'
+```
+
+### Success Response
+
+**Status:** 200 OK
+
+```json
+{
+  "status": "success",
+  "message": "PreSigned URL Generated",
+  "data": {
+    "uploadURL": "https://gitfolio-assets.s3.amazonaws.com/users/user_123/profile/avatar.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=...",
+    "fileURL": "https://gitfolio-assets.s3.amazonaws.com/users/user_123/profile/avatar.jpg",
+    "key": "users/user_123/profile/avatar.jpg",
+    "expiresIn": 300
+  }
+}
+```
+
+### Error Responses
+
+#### Unauthorized
+
+**Status:** 401 Unauthorized
+
+```json
+{
+  "message": "Missing or invalid token"
+}
+```
+
+#### Missing Parameters
+
+**Status:** 400 Bad Request
+
+```json
+{
+  "status": "error",
+  "message": "Type and filename are required"
+}
+```
+
+#### URL Generation Failed
+
+**Status:** 500 Internal Server Error
+
+```json
+{
+  "status": "error",
+  "message": "Error Generating Url"
+}
+```
+
+#### Server Error
+
+**Status:** 500 Internal Server Error
+
+```json
+{
+  "status": "error",
+  "message": "Internal Server Error"
+}
+```
+
+---
+
+## Upload Flow
+
+The complete file upload process involves two steps:
+
+### Step 1: Get Pre-Signed URL
+
+Request a pre-signed URL from the GitFolio API:
+
+```javascript
+const response = await fetch('https://api.gitfolio.in/api/v1/s3/generatePreSignedURL', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${clerkToken}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    type: 'profile',
+    filename: 'avatar.jpg'
+  })
+});
+
+const { data } = await response.json();
+const { uploadURL, fileURL } = data;
+```
+
+### Step 2: Upload File to S3
+
+Use the pre-signed URL to upload the file directly to S3:
+
+```javascript
+const file = document.getElementById('fileInput').files[0];
+
+const uploadResponse = await fetch(uploadURL, {
+  method: 'PUT',
+  body: file,
+  headers: {
+    'Content-Type': file.type
+  }
+});
+
+if (uploadResponse.ok) {
+  console.log('File uploaded successfully!');
+  console.log('File accessible at:', fileURL);
+  
+  // Save fileURL to user profile
+  await updateUserProfile({ profileImg: fileURL });
+}
+```
+
+---
+
+## Complete Upload Example
+
+Here's a complete example for uploading a profile image:
+
+```javascript
+async function uploadProfileImage(file, clerkToken) {
+  try {
+    // Step 1: Get pre-signed URL
+    const urlResponse = await fetch(
+      'https://api.gitfolio.in/api/v1/s3/generatePreSignedURL',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${clerkToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          type: 'profile',
+          filename: file.name
+        })
+      }
+    );
+
+    const { status, data, message } = await urlResponse.json();
+    
+    if (status !== 'success') {
+      throw new Error(message);
+    }
+
+    // Step 2: Upload file to S3
+    const uploadResponse = await fetch(data.uploadURL, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type
+      }
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload file to S3');
+    }
+
+    // Step 3: Return the permanent file URL
+    return data.fileURL;
+    
+  } catch (error) {
+    console.error('Upload failed:', error);
+    throw error;
+  }
+}
+
+// Usage
+const fileInput = document.getElementById('profileImage');
+const file = fileInput.files[0];
+
+const imageUrl = await uploadProfileImage(file, userClerkToken);
+console.log('Image uploaded:', imageUrl);
+
+// Update user profile with new image URL
+await fetch('https://api.gitfolio.in/api/v1/dashboard/user/update', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${userClerkToken}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    profileImg: imageUrl
+  })
+});
+```
+
+---
+
+## File Types and Sizes
+
+### Supported File Types
+
+The API supports common image formats:
+- **Images:** `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.svg`
+- **Documents:** `.pdf` (for resumes, if supported)
+
+### File Size Limits
+
+<Warning>
+  While the API doesn't enforce size limits, S3 and browser limitations apply:
+  
+  - Maximum file size: 5 GB (S3 limit for PUT requests)
+  - Recommended maximum: 5 MB for images
+  - Profile images: 1-2 MB recommended
+  - Thumbnails: 500 KB recommended
+</Warning>
+
+### File Naming
+
+Best practices for filenames:
+- Use descriptive names: `avatar.jpg` instead of `img123.jpg`
+- Avoid special characters and spaces
+- Include file extensions
+- Use lowercase for consistency
+
+---
+
+## S3 Folder Structure
+
+Files are organized in S3 by user and type:
+
+```
+users/
+  {userId}/
+    profile/
+      avatar.jpg
+      banner.png
+    repo/
+      project1-thumb.png
+      project2-thumb.jpg
+    company/
+      techcorp-logo.png
+    institution/
+      stanford-logo.png
+    project/
+      screenshot1.png
+      demo.gif
+```
+
+The `type` parameter determines which folder the file goes into.
+
+---
+
+## Security Considerations
+
+<AccordionGroup>
+  <Accordion title="Pre-signed URL expiration">
+    Pre-signed URLs expire after 5 minutes (300 seconds). If upload fails or takes too long:
+    - Request a new pre-signed URL
+    - Don't cache or reuse expired URLs
+    - Implement retry logic with new URL generation
+  </Accordion>
+
+  <Accordion title="File validation">
+    Always validate files before uploading:
+    - Check file type (MIME type)
+    - Verify file size
+    - Scan for malware if possible
+    - Validate image dimensions for images
+  </Accordion>
+
+  <Accordion title="User isolation">
+    Each user's files are stored in their own folder:
+    - Users can only generate URLs for their own folder
+    - Files are namespaced by user ID
+    - No access to other users' files
+  </Accordion>
+
+  <Accordion title="Public accessibility">
+    Uploaded files are publicly accessible:
+    - Anyone with the URL can view the file
+    - Don't upload sensitive or private data
+    - Files are not encrypted at rest
+    - Consider using S3 lifecycle policies for deletion
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Common Use Cases
+
+### Profile Image Upload
+
+```javascript
+// Upload profile avatar
+const profileUrl = await uploadFile(avatarFile, 'profile', 'avatar.jpg');
+await updateProfile({ profileImg: profileUrl });
+```
+
+### Repository Thumbnail
+
+```javascript
+// Upload project screenshot
+const thumbUrl = await uploadFile(screenshot, 'repo', 'project-thumb.png');
+await updateRepo(repoId, { thumbnail: thumbUrl });
+```
+
+### Company Logo
+
+```javascript
+// Upload company logo for experience
+const logoUrl = await uploadFile(logo, 'company', 'techcorp-logo.png');
+await updateExperience(expId, { logo: logoUrl });
+```
+
+### Institution Logo
+
+```javascript
+// Upload school logo for education
+const logoUrl = await uploadFile(logo, 'institution', 'stanford-logo.png');
+await updateEducation(eduId, { logo: logoUrl });
+```

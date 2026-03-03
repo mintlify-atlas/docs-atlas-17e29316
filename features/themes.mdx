@@ -1,0 +1,384 @@
+---
+title: Themes and styling
+description: Dark mode, light mode, and theme customization for your portfolio
+---
+
+## Overview
+
+GitFolio templates support both light and dark themes, giving your portfolio a modern look that adapts to user preferences. Theme switching is powered by `next-themes` and provides seamless transitions between modes.
+
+## Dark and light mode
+
+All GitFolio templates include built-in support for light and dark themes:
+
+<Tabs>
+  <Tab title="How it works">
+    GitFolio uses the `next-themes` library to manage theme state:
+
+    ```tsx
+    import { useTheme } from "next-themes";
+
+    const { theme, setTheme, resolvedTheme } = useTheme();
+
+    // Toggle between themes
+    const toggleTheme = () => {
+      setTheme(theme === "dark" ? "light" : "dark");
+    };
+    ```
+
+    The theme state is persisted in localStorage and applied on page load.
+  </Tab>
+  <Tab title="Implementation">
+    Templates implement theme switching with a toggle button:
+
+    ```tsx
+    // From mode-toggle.tsx
+    export function ModeToggle({ variant = "ghost", classname }) {
+      const { theme, setTheme, resolvedTheme } = useTheme();
+      
+      const changeTheme = () => {
+        setTheme(theme === "dark" ? "light" : "dark");
+      };
+
+      return (
+        <Button
+          variant={variant}
+          type="button"
+          size="icon"
+          className={classname}
+          onClick={changeTheme}
+        >
+          <SunIcon className="h-[1.2rem] w-[1.2rem] dark:hidden" />
+          <MoonIcon className="hidden h-[1.2rem] w-[1.2rem] dark:block" />
+        </Button>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Template-specific themes
+
+Some templates enforce a specific default theme:
+
+### Dark-first templates
+
+Templates like **Persona** and **Pixel Perfect** default to dark mode:
+
+```tsx
+// From Persona/template.tsx
+const template = ({ data = DummyData }: { data?: DATA }) => {
+  const { setTheme } = useTheme();
+  
+  useEffect(() => {
+    setTheme("dark"); // Force dark theme
+  }, []);
+  
+  return (
+    <main className="antialiased bg-[#0a0a0a] text-stone-200 min-h-screen">
+      {/* Template content */}
+    </main>
+  );
+};
+```
+
+This ensures the template displays with its intended aesthetic.
+
+### Flexible themes
+
+Other templates support both light and dark modes with adaptive styling:
+
+```tsx
+// Tailwind classes adapt to theme
+<div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+  <p className="text-muted-foreground">This text adapts to the current theme</p>
+</div>
+```
+
+## Theme configuration
+
+Themes are configured in your app's theme provider:
+
+<Steps>
+  <Step title="ThemeProvider setup">
+    Wrap your app with the ThemeProvider:
+
+    ```tsx
+    import { ThemeProvider } from "next-themes";
+
+    export default function App({ Component, pageProps }) {
+      return (
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Component {...pageProps} />
+        </ThemeProvider>
+      );
+    }
+    ```
+  </Step>
+  <Step title="CSS variables">
+    Define theme colors using CSS variables:
+
+    ```css
+    :root {
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
+      --primary: 222.2 47.4% 11.2%;
+      --muted: 210 40% 96.1%;
+      --border: 214.3 31.8% 91.4%;
+    }
+
+    .dark {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --primary: 210 40% 98%;
+      --muted: 217.2 32.6% 17.5%;
+      --border: 217.2 32.6% 17.5%;
+    }
+    ```
+  </Step>
+  <Step title="Apply to components">
+    Use the CSS variables in your Tailwind config:
+
+    ```js
+    // tailwind.config.js
+    module.exports = {
+      theme: {
+        extend: {
+          colors: {
+            background: "hsl(var(--background))",
+            foreground: "hsl(var(--foreground))",
+            primary: {
+              DEFAULT: "hsl(var(--primary))",
+              foreground: "hsl(var(--primary-foreground))",
+            },
+            muted: {
+              DEFAULT: "hsl(var(--muted))",
+              foreground: "hsl(var(--muted-foreground))",
+            },
+          },
+        },
+      },
+    };
+    ```
+  </Step>
+</Steps>
+
+## System preference detection
+
+GitFolio can automatically detect the user's system theme preference:
+
+```tsx
+const { systemTheme, theme } = useTheme();
+
+// Use system theme if no preference is set
+const currentTheme = theme === "system" ? systemTheme : theme;
+```
+
+This provides a native experience that matches the user's OS settings.
+
+## Theme toggle button
+
+Add a theme toggle to your portfolio's navigation:
+
+<Accordion title="Theme toggle component">
+  ```tsx
+  import { ModeToggle } from "@workspace/templates/components/mode-toggle";
+
+  export function Navbar() {
+    return (
+      <nav className="flex items-center justify-between p-4">
+        <div className="flex items-center gap-4">
+          <Logo />
+          <NavLinks />
+        </div>
+        <ModeToggle variant="ghost" />
+      </nav>
+    );
+  }
+  ```
+
+  The toggle button shows a sun icon in dark mode and a moon icon in light mode.
+</Accordion>
+
+## Template theme examples
+
+Here's how different templates implement theming:
+
+<CardGroup cols={2}>
+  <Card title="Pixel Perfect" icon="grid">
+    GitHub-inspired design with:
+    - Dark mode by default
+    - Light borders and separators
+    - Contribution graph in theme colors
+    - Subtle gradients
+  </Card>
+  <Card title="Persona" icon="user">
+    Dark-themed template with:
+    - Black background (`#0a0a0a`)
+    - Stone-200 text color
+    - Animated gradient effects
+    - High contrast elements
+  </Card>
+  <Card title="White Space" icon="layout">
+    Flexible theme with:
+    - Clean white/dark backgrounds
+    - Adaptive text colors
+    - Spacious layout
+    - Theme-aware shadows
+  </Card>
+  <Card title="Clean Slate" icon="sparkles">
+    Minimalist theming:
+    - Neutral color palette
+    - Subtle theme transitions
+    - Focus on readability
+    - System theme support
+  </Card>
+</CardGroup>
+
+## Custom color schemes
+
+While templates come with predefined themes, you can customize colors:
+
+### Modifying theme colors
+
+<Note>
+Advanced customization requires editing the template's CSS variables or Tailwind configuration. This is recommended for users comfortable with CSS and Tailwind.
+</Note>
+
+```css
+/* Override theme colors in your global CSS */
+.dark {
+  --background: 224 71% 4%;      /* Custom dark background */
+  --primary: 210 100% 50%;       /* Custom primary color */
+  --accent: 45 93% 47%;          /* Custom accent color */
+}
+```
+
+### Per-template customization
+
+Each template can have unique theme variables:
+
+```tsx
+// Obsidian template with gradient accents
+<main className="bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+  <div className="text-white">
+    {/* Dark theme with purple gradients */}
+  </div>
+</main>
+```
+
+## Accessibility considerations
+
+GitFolio themes are designed with accessibility in mind:
+
+<CardGroup cols={2}>
+  <Card title="Contrast ratios" icon="eye">
+    All text maintains WCAG AA contrast ratios:
+    - Normal text: 4.5:1 minimum
+    - Large text: 3:1 minimum
+    - UI components: 3:1 minimum
+  </Card>
+  <Card title="Reduced motion" icon="settings">
+    Respects user's motion preferences:
+
+    ```css
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    ```
+  </Card>
+  <Card title="Focus indicators" icon="target">
+    Clear focus states for keyboard navigation:
+
+    ```css
+    .focus-visible:focus {
+      outline: 2px solid hsl(var(--ring));
+      outline-offset: 2px;
+    }
+    ```
+  </Card>
+  <Card title="High contrast mode" icon="adjust">
+    Themes work with OS high contrast modes:
+
+    ```css
+    @media (prefers-contrast: high) {
+      :root {
+        --border: 0 0% 0%;
+        --foreground: 0 0% 0%;
+      }
+    }
+    ```
+  </Card>
+</CardGroup>
+
+## Theme persistence
+
+Theme preferences are saved automatically:
+
+```typescript
+// next-themes handles persistence via localStorage
+localStorage.setItem("theme", "dark");
+
+// On page load, the theme is restored
+const savedTheme = localStorage.getItem("theme") || "system";
+setTheme(savedTheme);
+```
+
+This ensures visitors see their preferred theme on repeat visits.
+
+## Troubleshooting themes
+
+<Accordion title="Theme not changing">
+  If the theme toggle doesn't work:
+
+  1. Ensure ThemeProvider wraps your app
+  2. Check that `attribute="class"` is set on ThemeProvider
+  3. Verify dark mode classes exist in your CSS
+  4. Clear localStorage and refresh the page
+</Accordion>
+
+<Accordion title="Flash of unstyled content">
+  To prevent theme flashing on page load:
+
+  ```tsx
+  <ThemeProvider
+    attribute="class"
+    defaultTheme="system"
+    enableSystem
+    disableTransitionOnChange  // Prevents flash
+  >
+    <YourApp />
+  </ThemeProvider>
+  ```
+</Accordion>
+
+<Accordion title="Template ignores theme">
+  Some templates enforce a specific theme:
+
+  ```tsx
+  useEffect(() => {
+    setTheme("dark"); // Template forces dark mode
+  }, []);
+  ```
+
+  This is intentional for templates designed for a specific aesthetic.
+</Accordion>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Choose a template" icon="palette" href="/features/templates">
+    Explore templates with different theme aesthetics
+  </Card>
+  <Card title="Customize content" icon="edit" href="/features/customization">
+    Personalize your portfolio content
+  </Card>
+</CardGroup>

@@ -1,0 +1,583 @@
+---
+title: 'Dashboard API'
+description: 'Manage user profiles, repositories, education, and experience'
+---
+
+## Overview
+
+The Dashboard API allows authenticated users to manage their portfolio data including profile information, repositories, education, and work experience.
+
+<Note>
+  All dashboard endpoints require authentication. Include your Clerk JWT token in the `Authorization` header.
+</Note>
+
+## Get User Data
+
+Retrieve all data for the authenticated user.
+
+```http
+GET /api/v1/dashboard
+```
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from Clerk authentication
+</ParamField>
+
+### Response
+
+<ResponseField name="status" type="string">
+  Status of the request: `success` or `error`
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable message describing the result
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  User data object containing profile, repos, education, and experience
+  
+  <Expandable title="User object properties">
+    <ResponseField name="id" type="string">
+      Unique user ID from Clerk
+    </ResponseField>
+    
+    <ResponseField name="username" type="string">
+      Unique username for portfolio URL
+    </ResponseField>
+    
+    <ResponseField name="firstname" type="string">
+      User's first name
+    </ResponseField>
+    
+    <ResponseField name="lastname" type="string">
+      User's last name
+    </ResponseField>
+    
+    <ResponseField name="email" type="string">
+      User's email address
+    </ResponseField>
+    
+    <ResponseField name="profileImg" type="string">
+      URL to profile image
+    </ResponseField>
+    
+    <ResponseField name="bio" type="string">
+      User's biography
+    </ResponseField>
+    
+    <ResponseField name="tagline" type="string">
+      Short tagline or headline
+    </ResponseField>
+    
+    <ResponseField name="location" type="string">
+      User's location
+    </ResponseField>
+    
+    <ResponseField name="website" type="string">
+      Personal website URL
+    </ResponseField>
+    
+    <ResponseField name="githubLink" type="string">
+      GitHub profile URL
+    </ResponseField>
+    
+    <ResponseField name="skills" type="string[]">
+      Array of skill names
+    </ResponseField>
+    
+    <ResponseField name="socialAccounts" type="object">
+      JSON object containing social media links
+    </ResponseField>
+    
+    <ResponseField name="accountType" type="enum">
+      `BASIC` or `PREMIUM`
+    </ResponseField>
+    
+    <ResponseField name="activeTemplateId" type="string">
+      ID of the currently active template
+    </ResponseField>
+    
+    <ResponseField name="repos" type="array">
+      Array of repository objects
+    </ResponseField>
+    
+    <ResponseField name="educations" type="array">
+      Array of education objects
+    </ResponseField>
+    
+    <ResponseField name="experiences" type="array">
+      Array of experience objects
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Request
+
+```bash
+curl -X GET https://api.gitfolio.in/api/v1/dashboard \
+  -H "Authorization: Bearer your_clerk_token"
+```
+
+### Example Response
+
+```json
+{
+  "status": "success",
+  "message": "Data fetched successfully",
+  "data": {
+    "id": "user_123abc",
+    "username": "johndoe",
+    "firstname": "John",
+    "lastname": "Doe",
+    "email": "john@example.com",
+    "profileImg": "https://example.com/avatar.jpg",
+    "bio": "Full-stack developer passionate about open source",
+    "tagline": "Building the future, one commit at a time",
+    "location": "San Francisco, CA",
+    "skills": ["JavaScript", "TypeScript", "React", "Node.js"],
+    "accountType": "PREMIUM",
+    "repos": [],
+    "educations": [],
+    "experiences": []
+  }
+}
+```
+
+---
+
+## Update User Profile
+
+Update profile information for the authenticated user.
+
+```http
+POST /api/v1/dashboard/user/update
+```
+
+### Request Body
+
+<ParamField body="username" type="string">
+  Unique username for portfolio URL
+</ParamField>
+
+<ParamField body="firstname" type="string">
+  User's first name
+</ParamField>
+
+<ParamField body="lastname" type="string">
+  User's last name
+</ParamField>
+
+<ParamField body="bio" type="string">
+  User biography
+</ParamField>
+
+<ParamField body="tagline" type="string">
+  Short tagline or headline
+</ParamField>
+
+<ParamField body="location" type="string">
+  User's location
+</ParamField>
+
+<ParamField body="website" type="string">
+  Personal website URL
+</ParamField>
+
+<ParamField body="githubLink" type="string">
+  GitHub profile URL
+</ParamField>
+
+<ParamField body="skills" type="string[]">
+  Array of skill names
+</ParamField>
+
+<ParamField body="socialAccounts" type="object">
+  JSON object with social media links (e.g., Twitter, LinkedIn)
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST https://api.gitfolio.in/api/v1/dashboard/user/update \
+  -H "Authorization: Bearer your_clerk_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "bio": "Full-stack developer and open source enthusiast",
+    "tagline": "Building great products",
+    "location": "San Francisco, CA",
+    "skills": ["JavaScript", "React", "Node.js"]
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "status": "success",
+  "message": "Data updated successfully"
+}
+```
+
+---
+
+## Repository Management
+
+### Create or Update Repository
+
+Add a new repository or update an existing one.
+
+```http
+POST /api/v1/dashboard/user/repo/update
+```
+
+### Request Body
+
+<ParamField body="id" type="string">
+  Repository ID (optional - if provided, updates existing repo)
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Repository name
+</ParamField>
+
+<ParamField body="description" type="string">
+  Repository description
+</ParamField>
+
+<ParamField body="topics" type="string[]">
+  Array of topic tags
+</ParamField>
+
+<ParamField body="languages" type="object">
+  JSON object with language percentages
+</ParamField>
+
+<ParamField body="stars" type="number">
+  Number of stars
+</ParamField>
+
+<ParamField body="forks" type="number">
+  Number of forks
+</ParamField>
+
+<ParamField body="repoLink" type="string" required>
+  URL to the repository
+</ParamField>
+
+<ParamField body="liveLink" type="string">
+  URL to live deployment
+</ParamField>
+
+<ParamField body="thumbnail" type="string">
+  URL to repository thumbnail image
+</ParamField>
+
+<ParamField body="isPinned" type="boolean">
+  Whether the repo is pinned (default: false)
+</ParamField>
+
+<ParamField body="isIncluded" type="boolean">
+  Whether to include in portfolio (default: true)
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST https://api.gitfolio.in/api/v1/dashboard/user/repo/update \
+  -H "Authorization: Bearer your_clerk_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "awesome-project",
+    "description": "An awesome open source project",
+    "topics": ["javascript", "react", "nodejs"],
+    "languages": {"JavaScript": 75, "CSS": 20, "HTML": 5},
+    "stars": 150,
+    "forks": 25,
+    "repoLink": "https://github.com/johndoe/awesome-project",
+    "liveLink": "https://awesome-project.com",
+    "isPinned": true
+  }'
+```
+
+### Delete Repository
+
+Remove a repository from the portfolio.
+
+```http
+DELETE /api/v1/dashboard/user/repo/delete/:repoId
+```
+
+### Path Parameters
+
+<ParamField path="repoId" type="string" required>
+  The UUID of the repository to delete
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X DELETE https://api.gitfolio.in/api/v1/dashboard/user/repo/delete/abc-123-def \
+  -H "Authorization: Bearer your_clerk_token"
+```
+
+---
+
+## Education Management
+
+### Create or Update Education
+
+Add or update an education entry.
+
+```http
+POST /api/v1/dashboard/user/education/update
+```
+
+### Request Body
+
+<ParamField body="id" type="string">
+  Education ID (optional - if provided, updates existing entry)
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  Degree or certification title
+</ParamField>
+
+<ParamField body="institution" type="string" required>
+  School or institution name
+</ParamField>
+
+<ParamField body="description" type="string">
+  Additional details about the education
+</ParamField>
+
+<ParamField body="logo" type="string">
+  URL to institution logo
+</ParamField>
+
+<ParamField body="start_date" type="string" required>
+  Start date (e.g., "2018-09" or "September 2018")
+</ParamField>
+
+<ParamField body="end_date" type="string">
+  End date (optional for ongoing education)
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST https://api.gitfolio.in/api/v1/dashboard/user/education/update \
+  -H "Authorization: Bearer your_clerk_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Bachelor of Science in Computer Science",
+    "institution": "Stanford University",
+    "description": "Focus on software engineering and AI",
+    "start_date": "2018-09",
+    "end_date": "2022-06"
+  }'
+```
+
+### Delete Education
+
+Remove an education entry.
+
+```http
+DELETE /api/v1/dashboard/user/education/delete/:educationId
+```
+
+### Path Parameters
+
+<ParamField path="educationId" type="string" required>
+  The UUID of the education entry to delete
+</ParamField>
+
+---
+
+## Experience Management
+
+### Create or Update Experience
+
+Add or update a work experience entry.
+
+```http
+POST /api/v1/dashboard/user/experience/update
+```
+
+### Request Body
+
+<ParamField body="id" type="string">
+  Experience ID (optional - if provided, updates existing entry)
+</ParamField>
+
+<ParamField body="company" type="string" required>
+  Company name
+</ParamField>
+
+<ParamField body="role" type="string" required>
+  Job title or role
+</ParamField>
+
+<ParamField body="description" type="string">
+  Job description and responsibilities
+</ParamField>
+
+<ParamField body="logo" type="string">
+  URL to company logo
+</ParamField>
+
+<ParamField body="start_date" type="string" required>
+  Start date (e.g., "2020-01" or "January 2020")
+</ParamField>
+
+<ParamField body="end_date" type="string">
+  End date (optional for current position)
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST https://api.gitfolio.in/api/v1/dashboard/user/experience/update \
+  -H "Authorization: Bearer your_clerk_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "company": "Tech Corp",
+    "role": "Senior Software Engineer",
+    "description": "Led development of microservices architecture",
+    "start_date": "2020-01",
+    "end_date": "2023-06"
+  }'
+```
+
+### Delete Experience
+
+Remove a work experience entry.
+
+```http
+DELETE /api/v1/dashboard/user/experience/delete/:experienceId
+```
+
+### Path Parameters
+
+<ParamField path="experienceId" type="string" required>
+  The UUID of the experience entry to delete
+</ParamField>
+
+---
+
+## Get User Payments
+
+Retrieve payment history for the authenticated user.
+
+```http
+GET /api/v1/dashboard/user/payments
+```
+
+### Response
+
+<ResponseField name="status" type="string">
+  `success` or `error`
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable message
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Array of payment objects
+  
+  <Expandable title="Payment object properties">
+    <ResponseField name="id" type="string">
+      Payment ID
+    </ResponseField>
+    
+    <ResponseField name="amount" type="number">
+      Payment amount
+    </ResponseField>
+    
+    <ResponseField name="currency" type="string">
+      Currency code (INR or USD)
+    </ResponseField>
+    
+    <ResponseField name="status" type="enum">
+      Payment status: `PENDING`, `SUCCESS`, or `FAILED`
+    </ResponseField>
+    
+    <ResponseField name="orderId" type="string">
+      Razorpay order ID
+    </ResponseField>
+    
+    <ResponseField name="paymentId" type="string">
+      Razorpay payment ID
+    </ResponseField>
+    
+    <ResponseField name="templateId" type="string">
+      ID of purchased template
+    </ResponseField>
+    
+    <ResponseField name="createdAt" type="string">
+      ISO 8601 timestamp of payment creation
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "status": "success",
+  "message": "Payments fetched successfully",
+  "data": [
+    {
+      "id": "pay_123",
+      "amount": 499,
+      "currency": "INR",
+      "status": "SUCCESS",
+      "orderId": "order_abc123",
+      "paymentId": "pay_xyz789",
+      "templateId": "template_456",
+      "createdAt": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+---
+
+## Error Responses
+
+### 400 Bad Request
+
+```json
+{
+  "status": "error",
+  "message": "userId is required"
+}
+```
+
+### 401 Unauthorized
+
+```json
+{
+  "message": "Missing or invalid token"
+}
+```
+
+### 404 Not Found
+
+```json
+{
+  "status": "error",
+  "message": "Data not found"
+}
+```
+
+### 500 Internal Server Error
+
+```json
+{
+  "status": "error",
+  "message": "Something went wrong"
+}
+```

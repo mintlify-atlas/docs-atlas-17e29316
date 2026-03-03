@@ -1,0 +1,194 @@
+---
+title: Contributing to GitFolio
+description: Learn how to contribute templates and features to GitFolio and help make it better for developers worldwide.
+---
+
+Thank you for your interest in contributing to GitFolio! We welcome contributions from the community and appreciate your efforts to improve the project.
+
+## What Can You Contribute?
+
+GitFolio is an open-source project that welcomes various types of contributions:
+
+- **Portfolio Templates** - Create new beautiful templates for the community
+- **Bug Fixes** - Help us identify and fix issues
+- **Feature Enhancements** - Suggest and implement new features
+- **Documentation** - Improve guides, tutorials, and examples
+- **Code Quality** - Refactoring, performance improvements, and testing
+
+## Getting Started
+
+<Steps>
+  <Step title="Fork the Repository">
+    Visit the [GitFolio repository](https://github.com/Skb3611/GitFolio) on GitHub and click the "Fork" button to create your own copy.
+  </Step>
+  
+  <Step title="Clone Your Fork">
+    ```bash
+    git clone https://github.com/YOUR-USERNAME/GitFolio.git
+    cd GitFolio
+    ```
+  </Step>
+  
+  <Step title="Set Up Development Environment">
+    Follow our [Development Setup](/community/development-setup) guide to install dependencies and configure your local environment.
+  </Step>
+  
+  <Step title="Create a Branch">
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+    Use descriptive branch names like `feature/new-template` or `fix/responsive-layout`.
+  </Step>
+</Steps>
+
+## Contribution Guidelines
+
+### Creating New Templates
+
+Templates are the heart of GitFolio. Follow these guidelines when contributing a new template:
+
+<Accordion title="Template Structure">
+  Each template should follow this structure:
+  
+  ```
+  Templates/
+  └── YourTemplateName/
+      ├── components/          # Template-specific components
+      │   ├── Header.tsx
+      │   ├── Footer.tsx
+      │   └── ...
+      ├── template.tsx         # Main template component
+  ```
+  
+  Create your template directory in `packages/templates/src/Templates/` with a descriptive name.
+</Accordion>
+
+<Accordion title="Template Implementation">
+  Your main template file should follow this pattern:
+  
+  ```tsx
+  import React, { FC } from "react";
+  import { DummyData } from "../dummyData";
+  import { DATA } from "@workspace/types";
+  import { useTheme } from "next-themes";
+
+  const template = ({ data = DummyData }: { data: DATA }) => {
+    const { setTheme } = useTheme();
+
+    React.useEffect(() => {
+      setTheme("dark"); // your preferred theme
+    }, []);
+
+    return <div>{/* Your template content */}</div>;
+  };
+
+  export default Template;
+  ```
+</Accordion>
+
+<Accordion title="Export Your Template">
+  Add an entry in `Templates/index.ts` to export your template:
+  
+  ```ts
+  export { default as YourTemplateName } from "./YourTemplateName/template";
+  ```
+</Accordion>
+
+<Accordion title="Test in Live Preview">
+  Import your template in `renderer/app/page.tsx` for live preview:
+  
+  ```tsx
+  import { YourTemplateName } from "@workspace/templates";
+
+  export default function Page() {
+    return <YourTemplateName />;
+  }
+  ```
+  
+  Then run the dev server:
+  ```bash
+  pnpm run dev --filter=renderer
+  ```
+</Accordion>
+
+### Quality Standards
+
+<Note>
+  All contributions must meet our quality standards before they can be merged. See our [Code Style Guide](/community/code-style) for detailed standards.
+</Note>
+
+Before submitting your contribution:
+
+- Ensure your template is **responsive** and works on all screen sizes
+- Follow **accessibility best practices** (semantic HTML, ARIA labels, keyboard navigation)
+- Use **TypeScript** with proper types for all props and data
+- Style with **Tailwind CSS** for consistency
+- Test your changes thoroughly
+- Run the build command to ensure no errors:
+  ```bash
+  pnpm run build --filter=renderer
+  ```
+
+## Submitting Pull Requests
+
+<Steps>
+  <Step title="Commit Your Changes">
+    ```bash
+    git add .
+    git commit -m "feat: add new portfolio template"
+    ```
+    Use clear, descriptive commit messages following conventional commits format.
+  </Step>
+  
+  <Step title="Push to Your Fork">
+    ```bash
+    git push origin feature/your-feature-name
+    ```
+  </Step>
+  
+  <Step title="Create Pull Request">
+    Go to the original GitFolio repository and click "New Pull Request". Select your fork and branch.
+  </Step>
+  
+  <Step title="Describe Your Changes">
+    - Provide a clear title and description
+    - Include screenshots for visual changes (especially templates)
+    - Reference any related issues
+    - Explain the motivation behind your changes
+  </Step>
+</Steps>
+
+### Pull Request Checklist
+
+Before submitting, ensure:
+
+- [ ] Code follows the [style guidelines](/community/code-style)
+- [ ] All tests pass locally
+- [ ] Build completes without errors
+- [ ] Template is responsive on mobile, tablet, and desktop
+- [ ] Screenshots are included in PR description (for templates)
+- [ ] Documentation is updated if needed
+- [ ] Commits follow conventional commit format
+
+## Review Process
+
+Once you submit a pull request:
+
+1. **Initial Review** - Maintainers will review your PR within a few days
+2. **Feedback** - Be responsive to feedback and willing to make changes
+3. **Approval** - Once approved, your PR will be merged
+4. **Credit** - You'll receive credit for your contribution!
+
+<Note>
+  Template creators will receive proper attribution for their work. Your name will be associated with your template in the GitFolio gallery.
+</Note>
+
+## Other Deployments
+
+Rest of the deployment process (publishing, hosting, etc.) will be handled by the maintainers. You only need to focus on creating great templates and features!
+
+## Questions?
+
+If you have questions about contributing, check our [FAQ](/community/faq) or reach out for [support](/community/support).
+
+Thank you for contributing to GitFolio and helping developers worldwide showcase their work!

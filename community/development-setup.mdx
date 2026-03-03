@@ -1,0 +1,304 @@
+---
+title: Development Setup
+description: Set up your local development environment to contribute to GitFolio templates and features.
+---
+
+This guide will help you set up GitFolio locally for development and contribution.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+<Steps>
+  <Step title="Node.js">
+    **Version 20 or higher** is required.
+    
+    Check your version:
+    ```bash
+    node --version
+    ```
+    
+    Download from [nodejs.org](https://nodejs.org/) if needed.
+  </Step>
+  
+  <Step title="pnpm Package Manager">
+    **Version 10.4.1 or higher** is required.
+    
+    Install pnpm globally:
+    ```bash
+    npm install -g pnpm@10.23.0
+    ```
+    
+    Verify installation:
+    ```bash
+    pnpm --version
+    ```
+  </Step>
+  
+  <Step title="Git">
+    Required for version control.
+    
+    Check if installed:
+    ```bash
+    git --version
+    ```
+  </Step>
+</Steps>
+
+## Initial Setup
+
+<Steps>
+  <Step title="Clone the Repository">
+    Clone the GitFolio repository to your local machine:
+    
+    ```bash
+    git clone https://github.com/Skb3611/GitFolio.git
+    cd GitFolio
+    ```
+  </Step>
+  
+  <Step title="Install Dependencies">
+    Install all project dependencies using pnpm:
+    
+    ```bash
+    pnpm install
+    ```
+    
+    This will install dependencies for all packages in the monorepo.
+  </Step>
+  
+  <Step title="Set Up Environment Variables">
+    Create a `.env` file in the root directory with necessary environment variables.
+    
+    <Note>
+      Contact the maintainers or check the project documentation for required environment variables.
+    </Note>
+  </Step>
+</Steps>
+
+## Monorepo Structure
+
+GitFolio uses a monorepo structure powered by **Turborepo** and **pnpm workspaces**:
+
+```
+GitFolio/
+├── apps/
+│   ├── renderer/        # Main rendering application
+│   └── playground/      # Development playground
+├── packages/
+│   ├── templates/       # Portfolio templates
+│   ├── types/           # Shared TypeScript types
+│   ├── eslint-config/   # ESLint configuration
+│   └── typescript-config/ # TypeScript configuration
+├── package.json         # Root package configuration
+└── turbo.json          # Turborepo configuration
+```
+
+## Development Commands
+
+GitFolio uses Turborepo to manage tasks across the monorepo. Here are the key commands:
+
+<CodeGroup>
+```bash Development Server
+# Start all dev servers
+pnpm run dev
+
+# Start specific package dev server
+pnpm run dev --filter=renderer
+```
+
+```bash Build
+# Build all packages
+pnpm run build
+
+# Build specific package
+pnpm run build --filter=renderer
+```
+
+```bash Linting
+# Lint all packages
+pnpm run lint
+
+# Format code
+pnpm run format
+```
+
+```bash Testing
+# Run tests
+pnpm run test
+
+# Run tests in watch mode
+pnpm run test:watch
+
+# Generate coverage report
+pnpm run test:coverage
+```
+
+```bash Production
+# Start production server
+pnpm run start
+```
+</CodeGroup>
+
+## Working with Templates
+
+The templates package is where all portfolio templates live.
+
+### Templates Package Structure
+
+```
+packages/templates/
+├── src/
+│   ├── Templates/           # All portfolio templates
+│   │   ├── Obsidian/        # Obsidian template
+│   │   │   ├── components/  # Template-specific components
+│   │   │   └── template.tsx # Main template file
+│   │   └── index.ts         # Exports all templates
+│   └── index.ts             # Package entry point
+├── package.json             # Package dependencies
+├── postcss.config.mjs       # PostCSS configuration
+└── tsconfig.json            # TypeScript configuration
+```
+
+### Building the Templates Package
+
+<Steps>
+  <Step title="Build Templates">
+    ```bash
+    pnpm run build --filter=renderer
+    ```
+  </Step>
+  
+  <Step title="Test in Playground">
+    Start the development server to see your changes:
+    
+    ```bash
+    pnpm run dev --filter=renderer
+    ```
+    
+    The renderer will be available at `http://localhost:3000`
+  </Step>
+</Steps>
+
+## Turborepo Tasks
+
+GitFolio uses Turborepo to efficiently run tasks across packages. Key tasks include:
+
+<Accordion title="build">
+  Builds all packages with proper dependency ordering. Uses caching to speed up repeated builds.
+  
+  ```json
+  "build": {
+    "dependsOn": ["^build"],
+    "outputs": [".next/**", "dist/**"],
+    "cache": true
+  }
+  ```
+</Accordion>
+
+<Accordion title="dev">
+  Starts development servers with hot reload. Runs persistently and doesn't use cache.
+  
+  ```json
+  "dev": {
+    "dependsOn": ["^dev"],
+    "cache": false,
+    "persistent": true
+  }
+  ```
+</Accordion>
+
+<Accordion title="lint">
+  Runs ESLint across all packages. Results are cached for efficiency.
+  
+  ```json
+  "lint": {
+    "outputs": [],
+    "cache": true
+  }
+  ```
+</Accordion>
+
+<Accordion title="test">
+  Runs test suites. Coverage reports are generated in `coverage/` directory.
+  
+  ```json
+  "test": {
+    "outputs": ["coverage/**"],
+    "cache": false
+  }
+  ```
+</Accordion>
+
+## Using Package Filters
+
+Turborepo allows you to run commands for specific packages using the `--filter` flag:
+
+```bash
+# Run dev server only for renderer
+pnpm run dev --filter=renderer
+
+# Build only templates package
+pnpm run build --filter=@workspace/templates
+
+# Lint specific app
+pnpm run lint --filter=playground
+```
+
+## Troubleshooting
+
+<Accordion title="Dependencies Not Installing">
+  If you encounter issues during `pnpm install`:
+  
+  1. Ensure you're using pnpm version 10.4.1 or higher
+  2. Clear pnpm cache: `pnpm store prune`
+  3. Delete `node_modules` and `pnpm-lock.yaml`, then reinstall
+  4. Make sure Node.js version is 20 or higher
+</Accordion>
+
+<Accordion title="Build Failures">
+  If builds are failing:
+  
+  1. Check TypeScript errors: Look for type issues in your code
+  2. Clear Turborepo cache: `rm -rf .turbo`
+  3. Rebuild from scratch: `pnpm run build`
+  4. Ensure all dependencies are installed
+</Accordion>
+
+<Accordion title="Dev Server Not Starting">
+  If the dev server won't start:
+  
+  1. Check if port 3000 is already in use
+  2. Verify environment variables are set correctly
+  3. Check console for error messages
+  4. Try running with verbose logging
+</Accordion>
+
+<Accordion title="Hot Reload Not Working">
+  If changes aren't reflecting:
+  
+  1. Restart the dev server
+  2. Clear browser cache
+  3. Check if files are being watched (look for file watcher limits on Linux)
+  4. Ensure you're editing files in the correct package
+</Accordion>
+
+## Editor Setup
+
+<Note>
+  For the best development experience, we recommend using Visual Studio Code with the following extensions:
+  - ESLint
+  - Prettier
+  - TypeScript and JavaScript Language Features
+  - Tailwind CSS IntelliSense
+</Note>
+
+## Next Steps
+
+Now that your development environment is set up:
+
+1. Review our [Code Style Guide](/community/code-style)
+2. Read the [Contributing Guidelines](/community/contributing)
+3. Start creating your first template!
+
+If you run into any issues, check our [FAQ](/community/faq) or reach out for [support](/community/support).

@@ -1,0 +1,178 @@
+---
+title: "Template Architecture"
+description: "Understanding GitFolio's template system and how templates are structured"
+---
+
+## Overview
+
+GitFolio templates are pre-built React components that transform your GitHub data into beautiful portfolio websites. Each template is a self-contained package that receives standardized user data and renders a unique portfolio design.
+
+## Template Architecture
+
+Templates in GitFolio follow a modular, component-based architecture built with React, TypeScript, and Tailwind CSS.
+
+### Core Structure
+
+Every template lives in the `packages/templates/src/Templates/` directory and follows this structure:
+
+```
+Templates/
+└── YourTemplateName/
+    ├── components/          # Template-specific components
+    │   ├── Hero.tsx
+    │   ├── Projects.tsx
+    │   ├── Experience.tsx
+    │   └── Footer.tsx
+    └── template.tsx         # Main template component
+```
+
+### The DATA Interface
+
+All templates receive a standardized `DATA` object from `@workspace/types` that contains:
+
+```typescript
+interface DATA {
+  personalInfo: PersonalInformation;
+  projects: Projects[];
+  experience: Experience[];
+  education: Education[];
+  socialLinks: SocialLinks;
+  skills: string[];
+}
+```
+
+<Note>
+The `DATA` interface ensures all templates have access to the same user information, making templates interchangeable.
+</Note>
+
+### Template Component Pattern
+
+Every template exports a default React component that follows this pattern:
+
+```tsx packages/templates/src/Templates/Obsidian/template.tsx
+"use client";
+import React from "react";
+import { DummyData } from "../dummyData";
+import { DATA } from "@workspace/types";
+import { useTheme } from "next-themes";
+
+const template = ({ data = DummyData }: { data?: DATA }) => {
+  const { setTheme } = useTheme();
+  
+  React.useEffect(() => {
+    setTheme("dark"); // Set preferred theme
+  }, []);
+  
+  return (
+    <div className="max-w-xl mx-auto overflow-hidden p-4">
+      {/* Template content */}
+    </div>
+  );
+};
+
+export default template;
+```
+
+## Template Categories
+
+GitFolio offers templates in two categories:
+
+<CardGroup cols={2}>
+  <Card title="FREE Templates" icon="gift">
+    Open-source templates available to all users. Includes Black & White, Clean Slate, DevPro, Persona, White Space, Pixel Perfect, Obsidian, and Notion Theme.
+  </Card>
+  <Card title="PRO Templates" icon="crown">
+    Premium templates with advanced features and unique designs (coming soon).
+  </Card>
+</CardGroup>
+
+## Template Metadata
+
+Each template has metadata defined in `packages/templates/src/metaData.ts`:
+
+```typescript
+interface TemplateData {
+  id: string;                    // Unique identifier
+  title: string;                 // Display name
+  description: string;           // Template description
+  thumbnail?: string;            // Preview image URL
+  video?: string;                // Video preview URL
+  component: React.ComponentType; // Template component
+  category: "FREE" | "PRO";     // Template tier
+  INRpricing: number;            // Price in INR
+  USDpricing: number;            // Price in USD
+  theme: "dark" | "light" | "both"; // Supported themes
+  mobileDevice?: "Iphone15Pro" | "Android"; // Preview device
+}
+```
+
+## Theme Support
+
+Templates use `next-themes` for dark/light mode switching:
+
+```tsx
+import { useTheme } from "next-themes";
+
+const { setTheme } = useTheme();
+
+// Set default theme on mount
+React.useEffect(() => {
+  setTheme("dark");
+}, []);
+```
+
+<Accordion title="How does theme switching work?">
+Templates can declare their preferred theme (dark, light, or both) in metadata. The `useTheme` hook from `next-themes` allows components to programmatically set and detect the current theme. Tailwind's dark mode classes handle the visual changes.
+</Accordion>
+
+## Shared Components
+
+Common components shared across templates live in `packages/templates/src/Templates/components/`:
+
+- `mode-toggle.tsx` - Theme switcher component
+- `UserTime.tsx` - Display user's local time
+- `Skill.tsx` - Skill badge component
+- `AnimatedSection.tsx` - Animated section wrapper
+
+## Dependencies
+
+Templates leverage these core dependencies:
+
+```json packages/templates/package.json
+{
+  "dependencies": {
+    "@workspace/types": "workspace:*",
+    "@workspace/ui": "workspace:*",
+    "motion": "^12.23.6",
+    "date-fns": "^4.1.0",
+    "next-themes": "^0.4.6"
+  }
+}
+```
+
+## Dummy Data for Development
+
+All templates use `DummyData` from `packages/templates/src/Templates/dummyData.ts` as default data during development:
+
+```tsx
+import { DummyData } from "../dummyData";
+
+const template = ({ data = DummyData }: { data?: DATA }) => {
+  // Template automatically falls back to dummy data
+};
+```
+
+<Note>
+Dummy data ensures templates render correctly during development before real user data is available.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Browse Templates" icon="images" href="/templates/available-templates">
+    Explore all available templates and their features
+  </Card>
+  <Card title="Create a Template" icon="code" href="/templates/creating-templates">
+    Learn how to build your own custom template
+  </Card>
+</CardGroup>

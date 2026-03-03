@@ -1,0 +1,275 @@
+---
+title: "Available Templates"
+description: "Explore all GitFolio portfolio templates and choose the perfect design for your portfolio"
+---
+
+## Template Gallery
+
+GitFolio currently offers 8 free templates, each with unique design aesthetics and layouts. All templates are fully responsive and optimized for performance.
+
+## Free Templates
+
+### Black & White
+
+<Card>
+  <img src="https://pub-7e33da773f24477fad91084ffacf40cb.r2.dev/templates/black-white/preview/desktop-dark.png" alt="Black & White Template" />
+</Card>
+
+A minimal, responsive template with dark/light modes and a sleek bottom dock for social networking.
+
+**Features:**
+- Dual theme support (dark/light)
+- Bottom dock navigation
+- Blur fade animations
+- Magic UI components
+- Clean typography
+
+**Best for:** Developers who prefer minimalist designs with smooth animations
+
+**Location:** `packages/templates/src/Templates/Black & White/`
+
+---
+
+### Clean Slate
+
+<Card>
+  <img src="https://pub-7e33da773f24477fad91084ffacf40cb.r2.dev/templates/clean-slate/preview/desktop-light.png" alt="Clean Slate Template" />
+</Card>
+
+A modern monochrome portfolio template that highlights your skills and projects with bold typography and a minimalist aesthetic.
+
+**Features:**
+- Both theme support
+- Bold typography
+- Skills showcase section
+- Projects grid layout
+- Contact section
+
+**Best for:** Designers and developers who value clean, modern aesthetics
+
+**Location:** `packages/templates/src/Templates/Clean Slate/`
+
+---
+
+### DevPro
+
+<Card>
+  <img src="https://pub-7e33da773f24477fad91084ffacf40cb.r2.dev/templates/devpro/preview/desktop-dark.png" alt="DevPro Template" />
+</Card>
+
+A fully responsive, center-aligned portfolio template with dark and light modes for a clean, professional look.
+
+**Features:**
+- Centered layout design
+- Decorative border elements
+- Both theme support
+- Professional styling
+- Optimized for readability
+
+**Best for:** Professional developers seeking a formal portfolio presentation
+
+**Location:** `packages/templates/src/Templates/DevPro/`
+
+**Key Component:**
+```tsx packages/templates/src/Templates/DevPro/template.tsx
+<div className="dark:bg-neutral-950 bg-neutral-100">
+  <div className="relative sm:max-w-4xl w-full mx-auto min-h-screen">
+    <NavbarComponent />
+    <Main data={data} />
+    <Footer />
+  </div>
+</div>
+```
+
+---
+
+### Persona
+
+<Card>
+  <img src="https://pub-7e33da773f24477fad91084ffacf40cb.r2.dev/templates/persona/preview/desktop-dark.png" alt="Persona Template" />
+</Card>
+
+A sleek, modern portfolio template featuring a clean single-page layout with a strong focus on personality and professionalism.
+
+**Features:**
+- Dark theme optimized
+- Text generation effects
+- Smooth section navigation
+- Education section support
+- Dynamic navbar
+
+**Best for:** Creative professionals who want to showcase personality
+
+**Location:** `packages/templates/src/Templates/Persona/`
+
+**Navigation Items:**
+```tsx
+const navItems = [
+  { id: "none", name: "Home", link: "#home", icon: <House /> },
+  { id: "projects", name: "Work", link: "#work", icon: <BriefcaseBusiness /> },
+  { id: "skills", name: "About", link: "#about", icon: <UserRound /> },
+  { id: "experience", name: "Experience", link: "#experience" },
+  { id: "education", name: "Education", link: "#education" },
+  { id: "none", name: "Contact", link: "#contact", icon: <ContactIco /> },
+];
+```
+
+---
+
+### White Space
+
+<Card>
+  <img src="https://pub-7e33da773f24477fad91084ffacf40cb.r2.dev/templates/white-space/preview/desktop-light.png" alt="White Space Template" />
+</Card>
+
+A clean and professional single-page portfolio with a centered profile section and tech stack highlights. Perfect for showcasing skills, projects, and availability at a glance.
+
+**Features:**
+- Light theme optimized
+- Abundant white space
+- Centered profile design
+- Tech stack highlights
+- Availability status
+
+**Best for:** Professionals who prefer light, airy designs
+
+**Location:** `packages/templates/src/Templates/White Space/`
+
+---
+
+### Pixel Perfect
+
+<Card>
+  <img src="https://pub-7e33da773f24477fad91084ffacf40cb.r2.dev/templates/pixel-perfect/preview/desktop-dark.png" alt="Pixel Perfect Template" />
+</Card>
+
+Minimalist, modern design with clean layouts, sleek UI components, and responsive light/dark themes.
+
+**Features:**
+- Both theme support
+- GitHub contributions graph
+- Panel-based layout
+- Profile cover section
+- Social links integration
+
+**Best for:** Developers who want a data-rich, comprehensive portfolio
+
+**Location:** `packages/templates/src/Templates/Pixel Perfect/`
+
+**Special Components:**
+- `GitHubContributions.tsx` - Displays contribution graph
+- `ProfileCover.tsx` - Hero cover section
+- `TechStack.tsx` - Technology showcase
+
+---
+
+### Obsidian
+
+<Card>
+  <img src="https://pub-7e33da773f24477fad91084ffacf40cb.r2.dev/templates/obsidian/preview/desktop-dark.png" alt="Obsidian Template" />
+</Card>
+
+A sleek dark-themed template featuring center-aligned text, crisp contrast, and minimalist styling for focused writing.
+
+**Features:**
+- Dark theme exclusive
+- Crisp contrast design
+- Center-aligned content
+- Social buttons
+- Skills section
+
+**Best for:** Developers who prefer dark interfaces and minimalism
+
+**Location:** `packages/templates/src/Templates/Obsidian/`
+
+**Template Structure:**
+```tsx packages/templates/src/Templates/Obsidian/template.tsx
+<div className="max-w-xl mx-auto overflow-hidden p-4">
+  <Hero data={data.personalInfo} />
+  <SocialButtons data={data.socialLinks} />
+  {data.skills.length > 0 && <SkillsSection data={data.skills} />}
+  {data.projects.length > 0 && <ProjectsSection data={data.projects} />}
+  {data.experience.length > 0 && <ExperienceSection data={data.experience} />}
+  <Footer username={data.personalInfo.username} />
+</div>
+```
+
+---
+
+### Notion Theme
+
+<Card>
+  <img src="https://pub-7e33da773f24477fad91084ffacf40cb.r2.dev/templates/notion-theme/preview/desktop-light.png" alt="Notion Theme Template" />
+</Card>
+
+A sleek, Notion-inspired portfolio template for creatives and professionals to showcase their work, projects, and skills with no coding required.
+
+**Features:**
+- Both theme support
+- Notion-style aesthetics
+- Profile section
+- Skills grid
+- Social integration
+
+**Best for:** Users familiar with Notion who want a similar aesthetic
+
+**Location:** `packages/templates/src/Templates/Notion Theme/`
+
+---
+
+## Template Comparison
+
+| Template | Theme Support | Best For | Complexity | Unique Features |
+|----------|---------------|----------|------------|----------------|
+| Black & White | Both | Minimalists | Medium | Bottom dock, blur animations |
+| Clean Slate | Both | Modern designers | Low | Bold typography |
+| DevPro | Both | Professionals | Low | Centered layout, borders |
+| Persona | Dark only | Creative professionals | Medium | Text generation, personality |
+| White Space | Light only | Clean aesthetics | Low | Abundant white space |
+| Pixel Perfect | Both | Data-driven devs | High | GitHub graph, panels |
+| Obsidian | Dark only | Dark theme lovers | Low | Minimalist dark |
+| Notion Theme | Both | Notion users | Medium | Notion aesthetics |
+
+## Choosing Your Template
+
+<AccordionGroup>
+  <Accordion title="I want a minimalist design">
+    Consider **Black & White**, **Obsidian**, or **Clean Slate**. These templates focus on simplicity and readability.
+  </Accordion>
+  
+  <Accordion title="I need both dark and light themes">
+    Choose **Black & White**, **Clean Slate**, **DevPro**, **Pixel Perfect**, or **Notion Theme** - all support theme switching.
+  </Accordion>
+  
+  <Accordion title="I want to showcase my GitHub activity">
+    **Pixel Perfect** includes a GitHub contributions graph component, making it ideal for displaying your coding activity.
+  </Accordion>
+  
+  <Accordion title="I prefer a professional, formal look">
+    **DevPro** and **White Space** offer clean, professional designs perfect for job applications.
+  </Accordion>
+</AccordionGroup>
+
+## Switching Templates
+
+You can switch between templates anytime in your GitFolio dashboard:
+
+1. Navigate to the Templates tab
+2. Preview available templates
+3. Click "Apply" on your chosen template
+4. Your portfolio updates instantly
+
+<Note>
+All templates use the same data structure, so switching preserves all your information.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Create Your Own" icon="code" href="/templates/creating-templates">
+    Learn how to build custom templates
+  </Card>
+  <Card title="Contribute" icon="git-alt" href="/templates/contributing">
+    Add your template to GitFolio
+  </Card>
+</CardGroup>

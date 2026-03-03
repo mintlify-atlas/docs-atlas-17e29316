@@ -1,0 +1,518 @@
+---
+title: Customization
+description: Customize your portfolio with profile information, projects, experience, and education
+---
+
+## Overview
+
+GitFolio gives you complete control over your portfolio content. While your initial data comes from GitHub, you can customize everything through the dashboard to create a portfolio that truly represents you.
+
+## Dashboard overview
+
+The dashboard is organized into focused tabs for different content types:
+
+<CardGroup cols={3}>
+  <Card title="Overview" icon="chart-line">
+    Dashboard home with content summary and quick actions
+  </Card>
+  <Card title="Personal Info" icon="user">
+    Edit your profile details and bio
+  </Card>
+  <Card title="Projects" icon="folder">
+    Manage which repositories appear in your portfolio
+  </Card>
+  <Card title="Experience" icon="briefcase">
+    Add and edit work experience
+  </Card>
+  <Card title="Education" icon="graduation-cap">
+    Showcase your educational background
+  </Card>
+  <Card title="Social Links" icon="link">
+    Connect your social media profiles
+  </Card>
+  <Card title="Skills" icon="code">
+    Highlight your technical skills
+  </Card>
+  <Card title="Templates" icon="palette">
+    Choose and preview templates
+  </Card>
+  <Card title="Preview" icon="eye">
+    See your live portfolio
+  </Card>
+</CardGroup>
+
+## Personal information
+
+Customize your profile through the **Personal Info** tab:
+
+### Editable fields
+
+<Tabs>
+  <Tab title="Profile basics">
+    ```typescript
+    interface PersonalInformation {
+      full_name: string;      // Your display name
+      tagline: string;        // Professional headline
+      bio: string;            // About you section
+      location: string;       // Your location
+      profileImg: string;     // Profile picture URL
+    }
+    ```
+
+    These fields are displayed prominently in your portfolio's hero section.
+  </Tab>
+  <Tab title="Read-only fields">
+    Some fields sync from GitHub and cannot be edited:
+
+    - **Username** - Your GitHub username
+    - **Email** - Primary email from GitHub
+    - **GitHub Profile** - Link to your GitHub account
+    - **Followers/Following** - Synced from GitHub
+
+    ```tsx
+    <Input value={`@${info.username}`} disabled className="bg-muted" />
+    <Input value={info.email} disabled className="bg-muted" />
+    ```
+  </Tab>
+</Tabs>
+
+### Uploading profile images
+
+You can upload a custom profile picture:
+
+<Steps>
+  <Step title="Click 'Edit Profile'">
+    Open the Personal Info tab and click the Edit Profile button
+  </Step>
+  <Step title="Choose image">
+    Click "Change Image" and select a file from your device (JPG, PNG, etc.)
+  </Step>
+  <Step title="Upload to S3">
+    GitFolio uploads your image to AWS S3 for fast, reliable hosting:
+
+    ```typescript
+    // From dashboard/page.tsx
+    const uploadImage = async (params) => {
+      // Get presigned URL from server
+      const res = await fetch(config.server_endpoints.GET_PRESIGNED_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          type: "Personal Information",
+          filename: "profile.jpg"
+        })
+      });
+      const { url, link } = await res.json();
+      
+      // Upload directly to S3
+      await fetch(url, { method: "PUT", body: imageFile });
+      
+      return link; // CDN URL for your image
+    };
+    ```
+  </Step>
+  <Step title="Save changes">
+    Click "Save Changes" to update your profile with the new image
+  </Step>
+</Steps>
+
+<Note>
+Profile images are stored in S3 with the naming pattern: `{userId}/Personal Information/profile.jpg`
+</Note>
+
+## Project customization
+
+Manage your portfolio projects in the **Projects** tab:
+
+### Project fields
+
+Each project includes these customizable fields:
+
+```typescript
+interface Projects {
+  id: string;
+  name: string;              // Project name
+  description: string;       // Project description
+  thumbnail: string;         // Project image/screenshot
+  repoLink: string;          // GitHub repository URL
+  liveLink: string;          // Live demo URL (optional)
+  topics: string[];          // Tags/topics
+  languages: object;         // Programming languages
+  stars: number;             // GitHub stars (auto-synced)
+  forks: number;             // GitHub forks (auto-synced)
+  isIncluded: boolean;       // Show in portfolio?
+}
+```
+
+### Adding projects
+
+Add custom projects not hosted on GitHub:
+
+<Steps>
+  <Step title="Click 'Add Project'">
+    Navigate to the Projects tab and click the Add Project button
+  </Step>
+  <Step title="Fill in details">
+    Required fields:
+    - Project name
+    - Description
+    - Repository link
+    - Thumbnail image
+
+    Optional fields:
+    - Live demo URL
+    - Topics/tags
+  </Step>
+  <Step title="Upload thumbnail">
+    Choose an image file or paste an image URL:
+
+    ```tsx
+    <Input
+      type="file"
+      accept="image/*"
+      onChange={handleFileChange}
+    />
+    // OR
+    <Input
+      placeholder="Or paste image URL"
+      value={project.thumbnail}
+    />
+    ```
+  </Step>
+  <Step title="Add topics">
+    Add relevant tags to help visitors understand the project:
+
+    ```typescript
+    const addTopic = () => {
+      if (newTopic && !project.topics.includes(newTopic)) {
+        setProject({
+          ...project,
+          topics: [...project.topics, newTopic.toLowerCase()]
+        });
+      }
+    };
+    ```
+  </Step>
+  <Step title="Save project">
+    Click "Save Changes" to add the project to your portfolio
+  </Step>
+</Steps>
+
+### Show/hide projects
+
+Control project visibility with the toggle switch:
+
+```typescript
+const toggleProject = (project: Projects) => {
+  onSave({
+    type: "Projects",
+    data: { ...project, isIncluded: !project.isIncluded }
+  });
+};
+```
+
+Projects with `isIncluded: false` are hidden from your portfolio but remain in your dashboard.
+
+### Editing projects
+
+Click any project card to edit:
+
+- Update project descriptions
+- Change thumbnails
+- Add or remove topics
+- Update live demo URLs
+- Modify repository links
+
+<Accordion title="Project validation">
+  GitFolio validates project data before saving:
+
+  ```typescript
+  const handleSaveProject = () => {
+    if (!editingProject.thumbnail) {
+      toast.warning("Please upload a thumbnail.");
+      return;
+    }
+    if (!editingProject.description) {
+      toast.warning("Please add a description.");
+      return;
+    }
+    if (!editingProject.name) {
+      toast.warning("Please add a Name.");
+      return;
+    }
+    if (!editingProject.repoLink) {
+      toast.warning("Please add Repo Link.");
+      return;
+    }
+    // Save project...
+  };
+  ```
+</Accordion>
+
+## Work experience
+
+Add your professional experience in the **Experience** tab:
+
+### Experience fields
+
+```typescript
+interface Experience {
+  id: string;
+  company: string;          // Company name
+  role: string;             // Job title
+  logo: string;             // Company logo URL
+  description: string;      // Role description (min 10 chars)
+  start_date: string;       // Format: "Month Year" (e.g., "June 2023")
+  end_date: string;         // "Month Year" or "Present"
+  onGoing: boolean;         // Currently working here?
+}
+```
+
+### Adding experience
+
+<Steps>
+  <Step title="Click 'Add Experience'">
+    Open the Experience tab and click Add Experience
+  </Step>
+  <Step title="Enter details">
+    Fill in:
+    - Job role/title
+    - Company name
+    - Start date (month + year)
+    - End date or check "Currently working here"
+  </Step>
+  <Step title="Upload logo">
+    Add a company logo:
+
+    ```tsx
+    <Avatar className="h-20 w-20">
+      <AvatarImage src={experience.logo} alt={experience.company} />
+      <AvatarFallback>
+        {experience.company.split(" ").map(n => n[0]).join("")}
+      </AvatarFallback>
+    </Avatar>
+    <Button onClick={() => fileInput.click()}>Change Image</Button>
+    ```
+  </Step>
+  <Step title="Write description">
+    Describe your role and achievements (minimum 10 characters):
+
+    ```tsx
+    <Textarea
+      placeholder="Describe your role and achievements..."
+      rows={4}
+      minLength={10}
+    />
+    ```
+  </Step>
+  <Step title="Save experience">
+    Click "Add Experience" to save to your portfolio
+  </Step>
+</Steps>
+
+### Date selection
+
+Experience dates use month + year dropdowns:
+
+```typescript
+const handleDateChange = (type: "start" | "end", field: "month" | "year", value: string) => {
+  const { month, year } = getDateParts(currentDate);
+  const newMonth = field === "month" ? value : month;
+  const newYear = field === "year" ? value : year;
+  const newDate = [newMonth, newYear].filter(Boolean).join(" ");
+  
+  setExperience({
+    ...experience,
+    [type === "start" ? "start_date" : "end_date"]: newDate
+  });
+};
+```
+
+### Current positions
+
+Check "Currently working here" to set `end_date: "Present"`:
+
+```tsx
+<Checkbox
+  id="ongoing"
+  checked={experience.onGoing}
+  onCheckedChange={(checked) => {
+    setExperience({
+      ...experience,
+      onGoing: checked,
+      end_date: checked ? "Present" : ""
+    });
+  }}
+/>
+```
+
+## Education
+
+Showcase your educational background in the **Education** tab:
+
+### Education fields
+
+```typescript
+interface Education {
+  id: string;
+  title: string;            // Degree/certificate name
+  institution: string;      // School/university name
+  logo: string;            // Institution logo
+  description: string;     // Optional details (min 10 chars if provided)
+  start_date: string;      // Year (e.g., "2019")
+  end_date: string;        // Year or "Present"
+  onGoing: boolean;        // Currently studying?
+}
+```
+
+### Adding education
+
+Similar to experience, but uses years instead of month+year:
+
+```tsx
+<Select value={education.start_date} onValueChange={(value) => setEducation({ ...education, start_date: value })}>
+  <SelectTrigger><SelectValue placeholder="Start Year" /></SelectTrigger>
+  <SelectContent>
+    {YEARS.map(year => (
+      <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+```
+
+<Note>
+Education descriptions are optional, but if provided must be at least 10 characters.
+</Note>
+
+## Social links
+
+Connect your social media profiles in the **Social Links** tab:
+
+```typescript
+interface SocialLinks {
+  twitter?: string;
+  linkedin?: string;
+  github?: string;
+  website?: string;
+  youtube?: string;
+  instagram?: string;
+  // Add any other social platforms
+}
+```
+
+### Link validation
+
+All social links must start with `https://`:
+
+```typescript
+const invalidLinks = Object.entries(socialLinks).filter(
+  ([_key, value]) => value && !value.startsWith("https://")
+);
+
+if (invalidLinks.length > 0) {
+  toast.error("Please make sure the following links start with https://");
+  return;
+}
+```
+
+## Skills
+
+Highlight your technical skills in the **Skills** tab:
+
+```typescript
+// Skills are stored as a string array
+interface User {
+  skills: string[];
+}
+
+// Example skills
+const skills = [
+  "TypeScript",
+  "React",
+  "Node.js",
+  "PostgreSQL",
+  "AWS"
+];
+```
+
+You can add, remove, and reorder skills to match your expertise.
+
+## Data persistence
+
+All customizations are saved to the database:
+
+```typescript
+// From dashboard/page.tsx
+const onSave = async ({ type, data }: SavePayload) => {
+  const token = await getToken();
+  
+  // Upload images if needed
+  if (hasImage) {
+    const imageUrl = await uploadImage({ token, type, data });
+    data = { ...data, [imageField]: imageUrl };
+  }
+  
+  // Save to database
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+  
+  toast.success(`${type} saved successfully`);
+};
+```
+
+Changes are reflected in your portfolio immediately after saving.
+
+## Deleting content
+
+You can delete experience and education entries:
+
+```typescript
+const onDelete = async (type: DeleteType, id: string) => {
+  const token = await getToken();
+  
+  switch (type) {
+    case DeleteType.PROJECT:
+      await fetch(`${config.server_endpoints.DELETE_REPO}/${id}`, {
+        method: "DELETE",
+        headers: { authorization: `Bearer ${token}` }
+      });
+      break;
+    
+    case DeleteType.EXPERIENCE:
+      await fetch(`${config.server_endpoints.DELETE_EXPERIENCE}/${id}`, {
+        method: "DELETE",
+        headers: { authorization: `Bearer ${token}` }
+      });
+      break;
+    
+    case DeleteType.EDUCATION:
+      await fetch(`${config.server_endpoints.DELETE_EDUCATION}/${id}`, {
+        method: "DELETE",
+        headers: { authorization: `Bearer ${token}` }
+      });
+      break;
+  }
+  
+  toast.success("Deleted successfully");
+};
+```
+
+<Warning>
+Deleting content is permanent. Associated images are also removed from S3 storage.
+</Warning>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Choose a template" icon="palette" href="/features/templates">
+    Select a template to showcase your customized content
+  </Card>
+  <Card title="Theme customization" icon="moon" href="/features/themes">
+    Customize colors and enable dark mode
+  </Card>
+</CardGroup>

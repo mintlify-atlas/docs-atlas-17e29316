@@ -1,0 +1,382 @@
+---
+title: Getting Support
+description: Find help, report issues, and connect with the GitFolio community for assistance with development and contributions.
+---
+
+Need help with GitFolio? This guide shows you where to find support and how to get assistance from the community.
+
+## Before Asking for Help
+
+Before reaching out, try these steps:
+
+<Steps>
+  <Step title="Check the Documentation">
+    Review our comprehensive guides:
+    - [Development Setup](/community/development-setup)
+    - [Contributing Guidelines](/community/contributing)
+    - [Code Style Guide](/community/code-style)
+    - [FAQ](/community/faq)
+  </Step>
+  
+  <Step title="Search Existing Issues">
+    Your question might already be answered:
+    - Browse [GitHub Issues](https://github.com/Skb3611/GitFolio/issues)
+    - Check closed issues for resolved problems
+    - Search for keywords related to your issue
+  </Step>
+  
+  <Step title="Review the Source Code">
+    The codebase itself can be informative:
+    - Look at existing templates for examples
+    - Check component implementations
+    - Read inline code comments
+  </Step>
+</Steps>
+
+## Support Channels
+
+### GitHub Issues
+
+Best for:
+- Bug reports
+- Feature requests
+- Technical problems
+- Build or setup issues
+
+<Note>
+  [Create a new issue](https://github.com/Skb3611/GitFolio/issues/new) on GitHub with a clear title and detailed description.
+</Note>
+
+**When creating an issue, include:**
+
+- **Clear title** - Summarize the problem in one line
+- **Description** - Explain the issue in detail
+- **Steps to reproduce** - How to recreate the problem
+- **Expected behavior** - What should happen
+- **Actual behavior** - What actually happens
+- **Environment details**:
+  - Node.js version (`node --version`)
+  - pnpm version (`pnpm --version`)
+  - Operating system
+  - Browser (if applicable)
+- **Screenshots** - Visual issues benefit from images
+- **Code snippets** - Relevant code that demonstrates the issue
+- **Error messages** - Complete error logs
+
+### GitHub Discussions
+
+Best for:
+- General questions
+- Design discussions
+- Feature ideas
+- Community conversations
+- Showing off your work
+
+<Note>
+  Start a discussion in the appropriate category for broader community engagement.
+</Note>
+
+### Pull Request Comments
+
+Best for:
+- Questions about specific code changes
+- Clarification on review feedback
+- Implementation discussions
+- Code-specific questions
+
+## Reporting Bugs
+
+When you encounter a bug:
+
+<Accordion title="1. Verify It's Actually a Bug">
+  Make sure the issue is reproducible:
+  
+  - Clear your cache and try again
+  - Test in a fresh clone of the repository
+  - Verify your dependencies are up to date
+  - Check if it happens in different environments
+</Accordion>
+
+<Accordion title="2. Gather Information">
+  Collect relevant details:
+  
+  ```bash
+  # Check versions
+  node --version
+  pnpm --version
+  git --version
+  
+  # Get build output
+  pnpm run build 2>&1 | tee build.log
+  
+  # Check for errors
+  pnpm run lint
+  ```
+</Accordion>
+
+<Accordion title="3. Create Minimal Reproduction">
+  Simplify the problem:
+  
+  - Remove unrelated code
+  - Isolate the specific component or feature
+  - Create a minimal example that shows the bug
+  - Test that the minimal example still reproduces the issue
+</Accordion>
+
+<Accordion title="4. Submit the Issue">
+  Use this template:
+  
+  ```markdown
+  ## Bug Description
+  [Clear description of what's wrong]
+  
+  ## Steps to Reproduce
+  1. Clone the repository
+  2. Run `pnpm install`
+  3. Run `pnpm run dev --filter=renderer`
+  4. Navigate to [specific page]
+  5. [Action that triggers the bug]
+  
+  ## Expected Behavior
+  [What should happen]
+  
+  ## Actual Behavior
+  [What actually happens]
+  
+  ## Environment
+  - Node.js: v20.x.x
+  - pnpm: 10.23.0
+  - OS: macOS 14.0 / Windows 11 / Ubuntu 22.04
+  - Browser: Chrome 120 (if applicable)
+  
+  ## Screenshots
+  [If applicable]
+  
+  ## Additional Context
+  [Any other relevant information]
+  ```
+</Accordion>
+
+## Requesting Features
+
+Have an idea for GitFolio?
+
+<Steps>
+  <Step title="Check Existing Requests">
+    Search issues and discussions to see if someone else has suggested the same feature.
+  </Step>
+  
+  <Step title="Describe the Use Case">
+    Explain:
+    - What problem does this solve?
+    - Who would benefit from this feature?
+    - How would it work from a user perspective?
+    - Are there examples of this in other projects?
+  </Step>
+  
+  <Step title="Propose Implementation (Optional)">
+    If you have technical ideas:
+    - How could this be implemented?
+    - What changes would be needed?
+    - Are there any technical challenges?
+    - Would you be willing to contribute the implementation?
+  </Step>
+  
+  <Step title="Submit the Request">
+    Create a GitHub issue with the "Feature Request" label or start a discussion.
+  </Step>
+</Steps>
+
+## Getting Code Review Help
+
+If you're stuck during code review:
+
+<Accordion title="Understand the Feedback">
+  If review comments are unclear:
+  
+  - Ask for clarification directly in the PR
+  - Request specific examples
+  - Ask about the reasoning behind suggestions
+  - Be respectful and open to learning
+</Accordion>
+
+<Accordion title="Request Additional Review">
+  If you're unsure about changes:
+  
+  - Make your best attempt at addressing feedback
+  - Comment on what you're uncertain about
+  - Ask for a second opinion
+  - Request a re-review when ready
+</Accordion>
+
+<Accordion title="Learn from Examples">
+  Look at merged PRs:
+  
+  - Find similar changes that were accepted
+  - Study how feedback was addressed
+  - Learn from successful contributions
+  - Apply those patterns to your work
+</Accordion>
+
+## Community Guidelines
+
+When seeking support:
+
+### Be Respectful
+
+- Treat everyone with kindness and respect
+- Assume good intentions
+- Be patient - maintainers and contributors are volunteers
+- Thank people for their help
+
+### Be Clear
+
+- Use descriptive titles
+- Provide complete information
+- Format code with syntax highlighting
+- Use screenshots when helpful
+
+### Be Patient
+
+- Responses may take time
+- Maintainers have other commitments
+- Don't bump issues immediately
+- Follow up politely if needed
+
+### Be Collaborative
+
+- Share solutions you find
+- Help others when you can
+- Contribute back to the community
+- Document your learnings
+
+## Common Issues & Solutions
+
+<Accordion title="Installation Problems">
+  **Issue**: Dependencies won't install
+  
+  **Solutions**:
+  ```bash
+  # Clear pnpm cache
+  pnpm store prune
+  
+  # Remove node_modules and lock file
+  rm -rf node_modules pnpm-lock.yaml
+  
+  # Reinstall
+  pnpm install
+  
+  # Verify Node version
+  node --version  # Should be 20+
+  ```
+</Accordion>
+
+<Accordion title="Build Failures">
+  **Issue**: Build fails with errors
+  
+  **Solutions**:
+  ```bash
+  # Clear Turborepo cache
+  rm -rf .turbo
+  
+  # Clear Next.js cache
+  rm -rf apps/renderer/.next
+  
+  # Rebuild
+  pnpm run build
+  
+  # Check TypeScript errors
+  pnpm run lint
+  ```
+</Accordion>
+
+<Accordion title="Dev Server Issues">
+  **Issue**: Dev server won't start
+  
+  **Solutions**:
+  - Check if port 3000 is in use
+  - Verify environment variables
+  - Check console for errors
+  - Try killing all Node processes and restarting
+  ```bash
+  # Kill Node processes (macOS/Linux)
+  pkill -f node
+  
+  # Restart dev server
+  pnpm run dev --filter=renderer
+  ```
+</Accordion>
+
+<Accordion title="Hot Reload Not Working">
+  **Issue**: Changes don't reflect in browser
+  
+  **Solutions**:
+  - Hard refresh browser (Cmd/Ctrl + Shift + R)
+  - Restart dev server
+  - Clear browser cache
+  - Check if you're editing the correct file
+  - Verify file watchers aren't maxed out (Linux)
+</Accordion>
+
+<Accordion title="TypeScript Errors">
+  **Issue**: Type errors in your code
+  
+  **Solutions**:
+  - Import types from `@workspace/types`
+  - Check TypeScript documentation
+  - Look at existing templates for examples
+  - Use proper type annotations
+  - Don't use `any` - use specific types
+</Accordion>
+
+## Response Time Expectations
+
+Typical response times:
+
+- **GitHub Issues** - Usually within a few days
+- **Pull Requests** - Initial review within a week
+- **Discussions** - Community responses may vary
+- **Critical bugs** - Higher priority, faster response
+
+<Note>
+  All maintainers and contributors are volunteers. Please be patient and understanding with response times.
+</Note>
+
+## Contributing to Support
+
+Help others in the community:
+
+- Answer questions in discussions
+- Help troubleshoot issues
+- Review pull requests
+- Improve documentation
+- Share your experiences
+
+Every contribution helps make GitFolio better!
+
+## Emergency Contact
+
+For urgent security issues:
+
+<Note>
+  Do NOT report security vulnerabilities in public issues. Contact the maintainers privately through GitHub or the email in the repository.
+</Note>
+
+## Additional Resources
+
+- **Repository**: [github.com/Skb3611/GitFolio](https://github.com/Skb3611/GitFolio)
+- **Website**: [gitfolio.in](https://gitfolio.in)
+- **License**: [MIT License](https://github.com/Skb3611/GitFolio/blob/main/LICENSE)
+- **Maintainer**: Shubham Bhilare
+
+## Get Involved
+
+The best way to get support is to be part of the community:
+
+- Star the repository on GitHub
+- Watch for updates and discussions
+- Participate in conversations
+- Share your templates and experiences
+- Help other contributors
+
+Together, we're building something great for developers worldwide!

@@ -1,0 +1,162 @@
+---
+title: 'Authentication'
+description: 'Authenticate API requests using Clerk JWT tokens'
+---
+
+## Overview
+
+GitFolio uses [Clerk](https://clerk.com) for authentication. All authenticated endpoints require a valid JWT token in the `Authorization` header.
+
+## Authentication Flow
+
+1. User signs in through the GitFolio frontend using Clerk
+2. Clerk issues a JWT token to the client
+3. Client includes the token in API requests
+4. Server validates the token using Clerk's backend SDK
+
+## Making Authenticated Requests
+
+Include the JWT token in the `Authorization` header with the `Bearer` scheme:
+
+```bash
+curl -X GET https://api.gitfolio.in/api/v1/dashboard \
+  -H "Authorization: Bearer <your_clerk_jwt_token>" \
+  -H "Content-Type: application/json"
+```
+
+## Authentication Middleware
+
+The following endpoints require authentication:
+
+- All `/api/v1/dashboard` endpoints
+- All `/api/v1/s3` endpoints
+- All `/api/v1/onboarding` endpoints
+- All `/api/v1/razorpay` endpoints
+
+## Token Validation
+
+The server validates tokens using:
+
+1. **Clerk Secret Key** - Validates the token signature
+2. **Clerk JWT Key** - Verifies token claims
+3. **User Lookup** - Fetches user details from Clerk
+
+The validation process:
+
+```typescript
+const token = authHeader.split('Bearer ')[1];
+const { sid, sub } = await verifyToken(token, {
+  jwtKey: CLERK_JWT_KEY
+});
+const user = await clerkClient.users.getUser(sub);
+```
+
+## Request Context
+
+After successful authentication, the user context is attached to the request:
+
+```typescript
+req.auth = {
+  sessionId: string,  // Clerk session ID
+  userId: string,     // Clerk user ID
+  user: User          // Full Clerk user object
+}
+```
+
+## Error Responses
+
+### Missing Token
+
+**Status:** 401 Unauthorized
+
+```json
+{
+  "message": "Missing or invalid token"
+}
+```
+
+### Invalid Token
+
+**Status:** 401 Unauthorized
+
+```json
+{
+  "status": false,
+  "message": "Unauthorized"
+}
+```
+
+### Server Error
+
+**Status:** 500 Internal Server Error
+
+```json
+{
+  "status": false,
+  "message": "Internal Server Error"
+}
+```
+
+## Sign-in Methods
+
+GitFolio supports three authentication methods through Clerk:
+
+<ParamField path="authType" type="enum">
+  The authentication method used during sign-in
+  
+  - `GITHUB` - Sign in with GitHub OAuth
+  - `GOOGLE` - Sign in with Google OAuth
+  - `EMAIL` - Sign in with email/password
+</ParamField>
+
+The `authType` is stored in the user's profile and used during onboarding.
+
+## User ID
+
+The `userId` from Clerk is used as the primary identifier throughout the GitFolio database. It's a string value that uniquely identifies each user.
+
+## Security Best Practices
+
+<AccordionGroup>
+  <Accordion title="Never expose tokens">
+    - Never commit tokens to version control
+    - Don't log tokens in production
+    - Use environment variables for sensitive keys
+  </Accordion>
+
+  <Accordion title="Token rotation">
+    - Tokens have expiration times set by Clerk
+    - Implement token refresh logic in your client
+    - Handle 401 errors by refreshing tokens
+  </Accordion>
+
+  <Accordion title="HTTPS only">
+    - Always use HTTPS in production
+    - Tokens sent over HTTP can be intercepted
+    - The API enforces HTTPS in production
+  </Accordion>
+</AccordionGroup>
+
+## Example: Getting User Data
+
+```javascript
+const response = await fetch('https://api.gitfolio.in/api/v1/dashboard', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${clerkToken}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+const data = await response.json();
+```
+
+## Public Endpoints
+
+These endpoints do NOT require authentication:
+
+- `GET /api/v1/renderer/:username` - Public portfolio view
+- `GET /api/v1/renderer/image/:username` - Portfolio image data
+- `GET /api/health` - API health check
+
+All other endpoints require a valid authentication token.

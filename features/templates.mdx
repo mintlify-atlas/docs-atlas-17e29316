@@ -1,0 +1,222 @@
+---
+title: Templates
+description: Choose from professionally designed templates to showcase your GitHub portfolio
+---
+
+## Overview
+
+GitFolio offers a curated collection of professionally designed templates that transform your GitHub profile into a stunning portfolio website. Each template is fully responsive, optimized for performance, and designed to highlight your projects and experience.
+
+## Available templates
+
+GitFolio currently offers 8 unique templates, each with its own design aesthetic:
+
+<CardGroup cols={2}>
+  <Card title="Black & White" icon="palette">
+    Minimalist design with bold typography and clean layouts
+  </Card>
+  <Card title="DevPro" icon="code">
+    Developer-focused template with project highlights
+  </Card>
+  <Card title="Persona" icon="user">
+    Personal branding with animated text effects
+  </Card>
+  <Card title="Clean Slate" icon="sparkles">
+    Modern and minimal with emphasis on readability
+  </Card>
+  <Card title="White Space" icon="layout">
+    Spacious design with clear visual hierarchy
+  </Card>
+  <Card title="Pixel Perfect" icon="grid">
+    GitHub-inspired design with contribution graphs
+  </Card>
+  <Card title="Obsidian" icon="moon">
+    Dark-themed template with gradient accents
+  </Card>
+  <Card title="Notion Theme" icon="file">
+    Notion-inspired clean interface
+  </Card>
+</CardGroup>
+
+## Template structure
+
+All templates follow a consistent structure defined in `packages/templates/src/Templates/`:
+
+```tsx
+const template = ({ data = DummyData }: { data?: DATA }) => {
+  return (
+    <main>
+      <Navbar />
+      <HeroSection data={data.personalInfo} />
+      <ProjectsSection data={data.projects} />
+      <ExperienceSection data={data.experience} />
+      <EducationSection data={data.education} />
+      <Footer socialLinks={data.socialLinks} />
+    </main>
+  );
+};
+```
+
+## Selecting a template
+
+Choose your template from the dashboard:
+
+<Steps>
+  <Step title="Navigate to Templates">
+    Go to the **Templates** tab in your dashboard sidebar
+  </Step>
+  <Step title="Browse templates">
+    View all available templates with live previews
+  </Step>
+  <Step title="Select your template">
+    Click on a template card to see full details and preview
+  </Step>
+  <Step title="Activate template">
+    Click the activate button to apply the template to your portfolio
+  </Step>
+</Steps>
+
+<Note>
+Your active template is saved in the `activeTemplateId` field on your user profile and persists across sessions.
+</Note>
+
+## Template categories
+
+Templates are organized into two categories in the database schema:
+
+<Tabs>
+  <Tab title="FREE">
+    Free templates are available to all users immediately upon signup. No purchase required.
+
+    ```prisma
+    model Template {
+      id          String   @id @default(uuid())
+      title       String   @unique
+      category    String   // "FREE"
+      USDpricing  Float    // 0.00
+      INRpricing  Float    // 0.00
+    }
+    ```
+  </Tab>
+  <Tab title="PRO">
+    Premium templates require a subscription or one-time purchase. Access is validated through the payment system.
+
+    ```typescript
+    // From dashboard.service.ts
+    if (template && template.category == "PRO") {
+      if (user.publicMetadata?.purchasedTemplates?.includes(templateId)) {
+        // Activate template
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Template features
+
+Each template includes these common components:
+
+### Navigation
+
+Responsive navigation bars with smooth scrolling to sections:
+
+```tsx
+const navItems = [
+  { id: "none", name: "Home", link: "#home" },
+  { id: "projects", name: "Work", link: "#work" },
+  { id: "skills", name: "About", link: "#about" },
+  { id: "experience", name: "Experience", link: "#experience" },
+];
+```
+
+### Hero section
+
+Displays your profile information, tagline, and bio from your GitHub account.
+
+### Projects showcase
+
+Dynamically renders all projects marked as `isIncluded: true` with:
+- Project thumbnails
+- Descriptions and topics
+- GitHub repository links
+- Live demo links
+- Star and fork counts
+- Programming language badges
+
+### Experience timeline
+
+Chronological display of your work experience with company logos, roles, and descriptions.
+
+### Education section
+
+Showcases your educational background with institution logos and degree information.
+
+### Skills grid
+
+Visual display of your technology skills and expertise areas.
+
+### Social links
+
+Footer with links to your social media profiles and contact information.
+
+## Template data binding
+
+Templates receive data through a standardized `DATA` interface:
+
+```typescript
+interface DATA {
+  personalInfo: PersonalInformation;
+  projects: Projects[];
+  experience: Experience[];
+  education: Education[];
+  socialLinks: SocialLinks;
+  skills: string[];
+}
+```
+
+This ensures all templates can display your information consistently regardless of design.
+
+## Previewing templates
+
+Before activating a template:
+
+1. Navigate to the **Preview** tab in your dashboard
+2. Your current template renders with your actual data
+3. Compare different templates by switching between them
+4. The preview updates in real-time as you edit your information
+
+<Accordion title="How template rendering works">
+  Template rendering happens through the renderer service at `apps/server/src/Routes/v1/renderer.route.ts`:
+
+  1. User data is fetched from the database
+  2. Template component is loaded based on `activeTemplateId`
+  3. Data is passed to the template component
+  4. Server-side rendering generates the HTML
+  5. Page is served at your portfolio URL
+</Accordion>
+
+## Template switching
+
+You can switch templates at any time without losing data:
+
+```typescript
+// From dashboard/page.tsx
+const onSave = async ({ type, data }: SavePayload) => {
+  if (type === "Template") {
+    await updateUserData(userId, { activeTemplateId: data.activeTemplateId });
+  }
+};
+```
+
+All your content (projects, experience, education) remains intact when changing templates.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Customize your portfolio" icon="palette" href="/features/customization">
+    Learn how to customize your profile, projects, and experience
+  </Card>
+  <Card title="Theme customization" icon="moon" href="/features/themes">
+    Explore dark/light mode and theme options
+  </Card>
+</CardGroup>
