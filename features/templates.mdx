@@ -80,37 +80,23 @@ Choose your template from the dashboard:
 Your active template is saved in the `activeTemplateId` field on your user profile and persists across sessions.
 </Note>
 
-## Template categories
+## Template availability
 
-Templates are organized into two categories in the database schema:
+All templates are currently **free** and available to all users immediately upon signup.
 
-<Tabs>
-  <Tab title="FREE">
-    Free templates are available to all users immediately upon signup. No purchase required.
+```prisma
+model Template {
+  id          String   @id @default(uuid())
+  title       String   @unique
+  category    String   // "FREE" for all current templates
+  USDpricing  Float    // 0.00
+  INRpricing  Float    // 0.00
+}
+```
 
-    ```prisma
-    model Template {
-      id          String   @id @default(uuid())
-      title       String   @unique
-      category    String   // "FREE"
-      USDpricing  Float    // 0.00
-      INRpricing  Float    // 0.00
-    }
-    ```
-  </Tab>
-  <Tab title="PRO">
-    Premium templates require a subscription or one-time purchase. Access is validated through the payment system.
-
-    ```typescript
-    // From dashboard.service.ts
-    if (template && template.category == "PRO") {
-      if (user.publicMetadata?.purchasedTemplates?.includes(templateId)) {
-        // Activate template
-      }
-    }
-    ```
-  </Tab>
-</Tabs>
+<Note>
+  While the codebase includes support for premium templates, all 8 templates currently available are free with no purchase required.
+</Note>
 
 ## Template features
 
